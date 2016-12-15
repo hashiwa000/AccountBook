@@ -1,0 +1,39 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.2.RELEASE'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // normal java program
+    // compile 'org.springframework.boot:spring-boot-starter'
+
+    // web application
+    compile 'org.springframework.boot:spring-boot-starter-web'
+
+    // database
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.apache.derby:derby'
+
+    // thymeleaf
+    compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
+    // test
+    testCompile 'org.springframework.boot:spring-boot-starter-test'
+}
+
+jar.baseName = 'account-book'
+
