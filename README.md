@@ -12,7 +12,7 @@ Todo List with Spring Boot
 
 ```
 $ git clone https://github.com/hashiwa000/AccountBook.git
-$ cd TodoListWithSpringBoot
+$ cd AccountBook
 $ vi src/main/resources/config/application.yml (edit database url)
 $ vi src/test/resources/config/application.yml (edit database url)
 $ gradle test
