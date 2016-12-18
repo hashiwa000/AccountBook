@@ -43,8 +43,8 @@ public class ABRestController {
       @RequestParam("amount") String amount,
       @RequestParam("name") String name,
       @RequestParam("type") String type,
-      @RequestParam("desc") String desc,
-      @RequestParam("remarks") String remarks) throws ParseException
+      @RequestParam(defaultValue = "") String desc,
+      @RequestParam(defaultValue = "") String remarks) throws ParseException
   {
     Date d = format.parse(date);
     long a = Long.parseLong(amount);
