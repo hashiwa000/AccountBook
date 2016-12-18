@@ -1,4 +1,4 @@
-package jp.hashiwa.todolist;
+package jp.hashiwa.accountbook;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -37,30 +37,34 @@ public class ApplicationTest {
 
   @Test
   public void testTodoListShow() throws Exception {
-    this.mockMvc.perform(get("/todolist/show"))
+    this.mockMvc.perform(get("/accountbook/show"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().contentType(TEXT_HTML_UTF8))
-      .andExpect(content().string(containsString("<title>Todo List</title>")))
+      .andExpect(content().string(containsString("<title>Account Book</title>")))
       .andExpect(content().string(containsString("table table-striped")))
-      .andExpect(content().string(containsString("Id")))
-      .andExpect(content().string(containsString("Title")))
-      .andExpect(content().string(containsString("Memo")))
-      .andExpect(content().string(containsString("Deadline")));
+      .andExpect(content().string(containsString("Date")))
+      .andExpect(content().string(containsString("Amount")))
+      .andExpect(content().string(containsString("Name")))
+      .andExpect(content().string(containsString("Type")))
+      .andExpect(content().string(containsString("Description")))
+      .andExpect(content().string(containsString("Remarks")));
   }
 
   @Test
   public void testTodoListCreate() throws Exception {
-    this.mockMvc.perform(get("/todolist/create"))
+    this.mockMvc.perform(get("/accountbook/create"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().contentType(TEXT_HTML_UTF8))
-      .andExpect(content().string(containsString("<title>Todo List</title>")))
-      .andExpect(content().string(containsString("<form action=\"/todolist/create\" method=\"post\">")))
-      .andExpect(content().string(containsString("<label for=\"inputTitle\">Title</label>")))
-      .andExpect(content().string(containsString("<label for=\"inputMemo\">Memo</label>")))
-      .andExpect(content().string(containsString("<label for=\"inputDeadline\">Deadline</label>")));
+      .andExpect(content().string(containsString("<title>Account Book</title>")))
+      .andExpect(content().string(containsString("<form action=\"/accountbook/create\" method=\"post\">")))
+      .andExpect(content().string(containsString("<label for=\"inputDate\">Date</label>")))
+      .andExpect(content().string(containsString("<label for=\"inputAmount\">Amount</label>")))
+      .andExpect(content().string(containsString("<label for=\"inputName\">Name</label>")))
+      .andExpect(content().string(containsString("<label for=\"inputType\">Type</label>")))
+      .andExpect(content().string(containsString("<label for=\"inputDesc\">Description</label>")))
+      .andExpect(content().string(containsString("<label for=\"inputRemarks\">Remarks</label>")));
   }
-
 
 }
