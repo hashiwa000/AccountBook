@@ -32,16 +32,9 @@ public class ABController {
 
   @RequestMapping(value="/show", method=RequestMethod.GET)
   public String showAccountBook(
-      //@RequestParam(defaultValue = "") String all,
       Model model)
   {
-    //boolean isAll = "true".equals(all.toLowerCase());
     List<ABItem> items = service.selectAll();
-    //if (!isAll) {
-    //  items = items.stream()
-    //    .filter(i -> i.done() == false)
-    //    .collect(Collectors.toList());
-    //}
     model.addAttribute("items", items);
     return "show_accountbook";
   }
@@ -59,8 +52,10 @@ public class ABController {
 
   @RequestMapping(value="/create", method=RequestMethod.GET)
   public String createAccountBook(Model model) {
-    List<ABPayer> payers = service.selectAllPayer();
+    List<ABPayer> payers = service.selectAllPayers();
+    List<ABType> types = service.selectAllTypes();
     model.addAttribute("payers", payers);
+    model.addAttribute("types", types);
     return "create_accountbook";
   }
 

@@ -18,6 +18,9 @@ public class ABService {
   @Autowired
   ABPayerRepository payerRepo;
 
+  @Autowired
+  ABTypeRepository typeRepo;
+
   public List<ABItem> selectAll() {
     return itemRepo.findAll(SORT);
   }
@@ -34,11 +37,20 @@ public class ABService {
     itemRepo.delete(id);
   }
 
-  public List<ABPayer> selectAllPayer() {
+  public List<ABPayer> selectAllPayers() {
     return payerRepo.findAll();
   }
 
   public void saveAndFlush(ABPayer payer) {
     payerRepo.saveAndFlush(payer);
   }
+
+  public List<ABType> selectAllTypes() {
+    return typeRepo.findAll();
+  }
+
+  public void saveAndFlush(ABType type) {
+    typeRepo.saveAndFlush(type);
+  }
+
 }

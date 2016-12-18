@@ -60,8 +60,8 @@ public class ABRestController {
   }
 
   @RequestMapping(value="/payer", method=RequestMethod.GET)
-  public List<ABPayer> getAllPayer() {
-    return service.selectAllPayer();
+  public List<ABPayer> getAllPayers() {
+    return service.selectAllPayers();
   }
 
   @RequestMapping(value="/payer", method=RequestMethod.POST)
@@ -72,4 +72,16 @@ public class ABRestController {
     return payer;
   }
 
+  @RequestMapping(value="/type", method=RequestMethod.GET)
+  public List<ABType> getAllTypes() {
+    return service.selectAllTypes();
+  }
+
+  @RequestMapping(value="/type", method=RequestMethod.POST)
+  @ResponseStatus(HttpStatus.CREATED)
+  public ABType postType(@RequestParam("name") String name) {
+    ABType type = new ABType(name);
+    service.saveAndFlush(type);
+    return type;
+  }
 }
