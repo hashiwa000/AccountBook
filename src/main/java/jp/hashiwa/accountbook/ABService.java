@@ -10,11 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ABService {
+  private static final Sort SORT = new Sort(Sort.Direction.ASC, "date", "id");
+
   @Autowired
   ABRepository repository;
 
   public List<ABItem> selectAll() {
-    return repository.findAll(new Sort(Sort.Direction.ASC, "id"));
+    return repository.findAll(SORT);
   }
 
   public ABItem select(long id) {
