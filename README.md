@@ -24,10 +24,26 @@ Access http://localhost:8080/accountbook from your browser.
 ## How to use REST API
 
 ```
-$ curl -X POST -d 'title=test&memo=This is memo.&deadline=2016-11-28 00:00:00' localhost:8080/rest/accountbook
-[{"id":1,"title":"test","memo":"This is memo.","deadline":1480258800000}]
+$ curl -X POST -d 'date=2016-12-15&amount=1000&name=test&type=xxx' http://localhost:8080/rest/accountbook | python -m json.tool
+{
+    "amount": 1000,
+    "date": 1481727600000,
+    "description": "",
+    "id": 701,
+    "name": "test",
+    "remarks": "",
+    "type": "xxx"
+}
 
-$ curl localhost:8080/rest/accountbook
-[{"id":1,"title":"test","memo":"This is memo.","deadline":1480258800000}]
+$ curl -X GET http://localhost:8080/rest/accountbook/701 | python -m json.tool
+{
+    "amount": 1000,
+    "date": 1481727600000,
+    "description": "",
+    "id": 701,
+    "name": "test",
+    "remarks": "",
+    "type": "xxx"
+}
 ```
 
