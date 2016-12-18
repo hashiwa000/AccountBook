@@ -13,21 +13,32 @@ public class ABService {
   private static final Sort SORT = new Sort(Sort.Direction.ASC, "date", "id");
 
   @Autowired
-  ABRepository repository;
+  ABItemRepository itemRepo;
+
+  @Autowired
+  ABPayerRepository payerRepo;
 
   public List<ABItem> selectAll() {
-    return repository.findAll(SORT);
+    return itemRepo.findAll(SORT);
   }
 
   public ABItem select(long id) {
-    return repository.findById(id);
+    return itemRepo.findById(id);
   }
 
   public void saveAndFlush(ABItem item) {
-    repository.saveAndFlush(item);
+    itemRepo.saveAndFlush(item);
   }
 
   public void delete(long id) {
-    repository.delete(id);
+    itemRepo.delete(id);
+  }
+
+  public List<ABPayer> selectAllPayer() {
+    return payerRepo.findAll();
+  }
+
+  public void saveAndFlush(ABPayer payer) {
+    payerRepo.saveAndFlush(payer);
   }
 }

@@ -58,7 +58,9 @@ public class ABController {
   }
 
   @RequestMapping(value="/create", method=RequestMethod.GET)
-  public String createAccountBook() {
+  public String createAccountBook(Model model) {
+    List<ABPayer> payers = service.selectAllPayer();
+    model.addAttribute("payers", payers);
     return "create_accountbook";
   }
 

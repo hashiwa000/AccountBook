@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @RestController
-@RequestMapping("/rest/accountbook")
+@RequestMapping("/rest")
 public class ABRestController {
 
   private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -25,18 +25,18 @@ public class ABRestController {
   @Autowired
   ABService service;
 
-  @RequestMapping(method=RequestMethod.GET)
+  @RequestMapping(value="/accountbook", method=RequestMethod.GET)
   public List<ABItem> getAll() {
     return service.selectAll();
   }
 
-  @RequestMapping(value="/{id}", method=RequestMethod.GET)
+  @RequestMapping(value="/accountbook/{id}", method=RequestMethod.GET)
   public ABItem get(@PathVariable long id) {
     // TODO: found check
     return service.select(id);
   }
 
-  @RequestMapping(method=RequestMethod.POST)
+  @RequestMapping(value="/accountbook", method=RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
   public ABItem post(
       @RequestParam("date") String date,
@@ -53,9 +53,23 @@ public class ABRestController {
     return item;
   }
 
-  @RequestMapping(value="/{id}", method=RequestMethod.DELETE)
+  @RequestMapping(value="/accountbook/{id}", method=RequestMethod.DELETE)
   public void delete(@PathVariable long id) {
     service.delete(id);
     // TODO: catch org.springframework.dao.EmptyResultDataAccessException
   }
+
+  @RequestMapping(value="/payer", method=RequestMethod.GET)
+  public List<ABPayer> getAllPayer() {
+    return service.selectAllPayer();
+  }
+
+  @RequestMapping(value="/payer", method=RequestMethod.POST)
+  @ResponseStatus(HttpStatus.CREATED)
+  public ABPayer postPayer(@RequestParam("name") String name) {
+    ABPayer payer = new ABPayer(name);
+    service.saveAndFlush(payer);
+    return payer;
+  }
+
 }
