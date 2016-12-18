@@ -2,6 +2,7 @@ package jp.hashiwa.accountbook;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,4 +68,18 @@ public class ApplicationTest {
       .andExpect(content().string(containsString("<label for=\"inputRemarks\">Remarks</label>")));
   }
 
+  @Test
+  public void testTodoListCreate2() throws Exception {
+    this.mockMvc.perform(post("/accountbook/create").param("date", "2016-12-15").param("amount", "1000").param("name", "test").param("type", "xxx").param("desc", "").param("remarks", ""))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(content().contentType(TEXT_HTML_UTF8))
+      .andExpect(content().string(containsString("Created:")))
+      .andExpect(content().string(containsString("xxx")));
+    this.mockMvc.perform(get("/accountbook/show"))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(content().contentType(TEXT_HTML_UTF8))
+      .andExpect(content().string(containsString("xxx")));
+  }
 }
