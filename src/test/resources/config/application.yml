@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:derby:/home/hashiwa/java/springboot/db_test;create=true
+    url: jdbc:derby:/home/hashiwa/java/AccountBook/db_test;create=true
     username: test
     password: test
     driverClassName: org.apache.derby.jdbc.EmbeddedDriver
