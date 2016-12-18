@@ -46,23 +46,16 @@ public class ABController {
     return "show_accountbook";
   }
 
-  //@RequestMapping(value="/show", method=RequestMethod.POST)
-  //public String showAccountBook(
-  //    @RequestParam(defaultValue = "-1") int idToDone,
-  //    @RequestParam(defaultValue = "-1") int idToDelete,
-  //    Model model)
-  //{
-  //  if (0 <= idToDone) {
-  //    Date now = new Date();
-  //    ABItem item = service.select(idToDone);
-  //    item.setDoneAt(now);
-  //    service.saveAndFlush(item);
-  //  }
-  //  if (0 <= idToDelete) {
-  //    service.delete(idToDelete);
-  //  }
-  //  return showABList("", model);
-  //}
+  @RequestMapping(value="/show", method=RequestMethod.POST)
+  public String showAccountBook(
+      @RequestParam(defaultValue = "-1") int idToDelete,
+      Model model)
+  {
+    if (0 <= idToDelete) {
+      service.delete(idToDelete);
+    }
+    return showAccountBook(model);
+  }
 
   @RequestMapping(value="/create", method=RequestMethod.GET)
   public String createAccountBook() {
