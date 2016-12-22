@@ -1,10 +1,11 @@
 package jp.hashiwa.accountbook;
 
-import java.util.List;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.stream.Collectors;
 import java.text.DateFormat;
+import java.util.List;
+import java.util.stream.Collectors;
 import java.text.SimpleDateFormat;
  
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +23,13 @@ import org.springframework.ui.Model;
 @RequestMapping("/accountbook")
 public class ABController {
 
-  private static final List<DateFormat> DATETIME_FORMATS = Arrays.<DateFormat>asList(
+  private static final List<DateFormat> DATE_FORMATS = Arrays.<DateFormat>asList(
       new SimpleDateFormat("yyyy-MM-dd"),
       new SimpleDateFormat("yyyy/MM/dd")
+    );
+  private static final List<DateFormat> MONTH_FORMATS = Arrays.<DateFormat>asList(
+      new SimpleDateFormat("yyyy-MM"),
+      new SimpleDateFormat("yyyy/MM")
     );
 
   @Autowired
@@ -32,22 +37,32 @@ public class ABController {
 
   @RequestMapping(value="/show", method=RequestMethod.GET)
   public String showAccountBook(
-      Model model)
+      @RequestParam(defaultValue = "") String month,
+      Model model) throws Exception
   {
-    List<ABItem> items = service.selectAll();
+    Date start;
+    if (month == null || "".equals(month)) {
+      start = getThisMonth();
+    } else {
+      start = parseMonthStr(month);
+    }
+    Date end = calcNextMonth(start);
+
+    List<ABItem> items = service.selectAll(start, end);
     model.addAttribute("items", items);
     return "show_accountbook";
   }
 
   @RequestMapping(value="/show", method=RequestMethod.POST)
   public String showAccountBook(
+      @RequestParam(defaultValue = "") String month,
       @RequestParam(defaultValue = "-1") int idToDelete,
-      Model model)
+      Model model) throws Exception
   {
     if (0 <= idToDelete) {
       service.delete(idToDelete);
     }
-    return showAccountBook(model);
+    return showAccountBook(month, model);
   }
 
   @RequestMapping(value="/create", method=RequestMethod.GET)
@@ -69,7 +84,7 @@ public class ABController {
       @RequestParam("remarks") String remarks,
       Model model) throws Exception
   {
-    Date d = parseDateTimeStr(date);
+    Date d = parseDateStr(date);
     ABItem item = new ABItem(d, amount, name, type, desc, remarks);
     service.saveAndFlush(item);
     List<ABItem> items = Arrays.<ABItem>asList(item);
@@ -77,9 +92,17 @@ public class ABController {
     return "created_accountbook";
   }
 
-  private Date parseDateTimeStr(String s) throws Exception {
+  private Date getThisMonth() {
+    Calendar c = Calendar.getInstance();
+    int year = c.get(Calendar.YEAR);
+    int month = c.get(Calendar.MONTH);
+    c.set(year, month, 0, 0, 0, 0);
+    return c.getTime();
+  }
+
+  private Date parseDateStr(String s) throws Exception {
     Exception lastException = null;
-    for (DateFormat format: DATETIME_FORMATS) {
+    for (DateFormat format: DATE_FORMATS) {
       try {
         return format.parse(s);
       } catch(Exception e) {
@@ -87,5 +110,24 @@ public class ABController {
       }
     }
     throw lastException;
+  }
+
+  private Date parseMonthStr(String s) throws Exception {
+    Exception lastException = null;
+    for (DateFormat format: MONTH_FORMATS) {
+      try {
+        return format.parse(s);
+      } catch(Exception e) {
+        lastException = e;
+      }
+    }
+    throw lastException;
+  }
+
+  private Date calcNextMonth(Date start) {
+    Calendar endCalendar = Calendar.getInstance();
+    endCalendar.setTime(start);
+    endCalendar.add(Calendar.MONTH, 1);
+    return endCalendar.getTime();
   }
 }

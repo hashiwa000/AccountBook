@@ -1,5 +1,6 @@
 package jp.hashiwa.accountbook;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,10 @@ public class ABService {
 
   public List<ABItem> selectAll() {
     return itemRepo.findAll(SORT);
+  }
+
+  public List<ABItem> selectAll(Date start, Date end) {
+    return itemRepo.findByDateBetween(start, end, SORT);
   }
 
   public ABItem select(long id) {
