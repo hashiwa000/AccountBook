@@ -25,7 +25,7 @@
           <li><a href="/accountbook/show">Show Items</a></li>
           <li class="active"><a href="/accountbook/create">Add item</a></li>
           <li class="dropdown">
-            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tools<span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="#">Action</a></li>
               <li><a href="#">Another action</a></li>
@@ -34,12 +34,16 @@
               <li class="dropdown-header">Nav header</li>
               <li><a href="#">Separated link</a></li>
               <li><a href="#">One more separated link</a></li>
+              <li><a href="" onclick="document.logoutform.submit();return false;">Log out</a></li>
             </ul>
           </li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
   </nav>
+  <form name="logoutform" method="POST" th:action="@{/logout}">
+    <input type="hidden" />
+  </form>
 
   <div>
   Created: 
