@@ -28,11 +28,18 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
     compile 'org.apache.derby:derby'
 
+    // authentication
+    compile 'org.springframework.boot:spring-boot-starter-security'
+
     // thymeleaf
     compile 'org.springframework.boot:spring-boot-starter-thymeleaf'
 
     // test
     testCompile 'org.springframework.boot:spring-boot-starter-test'
+
+    // utilities
+    //provided 'org.projectlombok:lombok'
+    compile 'org.projectlombok:lombok'
 }
 
 jar.baseName = 'account-book'

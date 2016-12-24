@@ -20,7 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
 @Controller
-@RequestMapping("/accountbook")
+@RequestMapping("/")
 public class ABController {
 
   private static final List<DateFormat> DATE_FORMATS = Arrays.<DateFormat>asList(
@@ -35,7 +35,12 @@ public class ABController {
   @Autowired
   ABService service;
 
-  @RequestMapping(value="/show", method=RequestMethod.GET)
+  @RequestMapping(value="/login", method=RequestMethod.GET)
+  public String login() {
+    return "login";
+  }
+ 
+  @RequestMapping(value="/accountbook/show", method=RequestMethod.GET)
   public String showAccountBook(
       @RequestParam(defaultValue = "") String month,
       Model model) throws Exception
@@ -53,7 +58,7 @@ public class ABController {
     return "show_accountbook";
   }
 
-  @RequestMapping(value="/show", method=RequestMethod.POST)
+  @RequestMapping(value="/accountbook/show", method=RequestMethod.POST)
   public String showAccountBook(
       @RequestParam(defaultValue = "") String month,
       @RequestParam(defaultValue = "-1") int idToDelete,
@@ -65,7 +70,7 @@ public class ABController {
     return showAccountBook(month, model);
   }
 
-  @RequestMapping(value="/create", method=RequestMethod.GET)
+  @RequestMapping(value="/accountbook/create", method=RequestMethod.GET)
   public String createAccountBook(Model model) {
     List<ABPayer> payers = service.selectAllPayers();
     List<ABType> types = service.selectAllTypes();
@@ -74,7 +79,7 @@ public class ABController {
     return "create_accountbook";
   }
 
-  @RequestMapping(value="/create", method=RequestMethod.POST)
+  @RequestMapping(value="/accountbook/create", method=RequestMethod.POST)
   public String createAccountBook(
       @RequestParam("date") String date,
       @RequestParam("amount") long amount,
