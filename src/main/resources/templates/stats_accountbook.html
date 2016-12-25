@@ -22,9 +22,9 @@
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="#">Show Items</a></li>
+          <li><a href="/accountbook/show">Show Items</a></li>
           <li><a href="/accountbook/create">Add item</a></li>
-          <li><a href="/accountbook/stats">Show Statistics</a></li>
+          <li class="active"><a href="#">Show Statistics</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tools<span class="caret"></span></a>
             <ul class="dropdown-menu">
@@ -50,30 +50,14 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>Date</th>
-          <th>Amount</th>
           <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Remarks</th>
-          <th><!-- delete button --></th>
+          <th th:each="column: ${header}" th:text="${column}"></th>
         </tr>
       </thead>
       <tbody>
-        <tr th:each="item: ${items}">
-          <td th:text="${#dates.format(item.date, 'yyyy/MM/dd (E)')}"></td>
-          <td th:text="${item.amount}"></td>
-          <td th:text="${item.name}"></td>
-          <td th:text="${item.type}"></td>
-          <td th:text="${item.description}"></td>
-          <td th:text="${item.remarks}"></td>
-          <td>
-            <form action="/accountbook/show" method="post">
-              <!-- TODO: add check dialog -->
-              <input type="hidden" name="idToDelete" th:value="${item.id}" />
-              <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-            </form>
-          </td>
+        <tr th:each="entry: ${map}">
+          <td th:text="${entry.getKey()}"></td>
+          <td th:each="column: ${entry.getValue()}" th:text="${column.getValue()}"></td>
         </tr>
       </tbody>
     </table>

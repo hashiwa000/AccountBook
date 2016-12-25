@@ -19,6 +19,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
+import jp.hashiwa.accountbook.statistics.ABStatistics;
+
 @Controller
 @RequestMapping("/")
 public class ABController {
@@ -95,6 +97,29 @@ public class ABController {
     List<ABItem> items = Arrays.<ABItem>asList(item);
     model.addAttribute("created", items);
     return "created_accountbook";
+  }
+
+  @RequestMapping(value="/accountbook/stats", method=RequestMethod.GET)
+  public String statsAccountBook(
+      @RequestParam(defaultValue = "") String month,
+      Model model) throws Exception
+  {
+    Date start;
+    if (month == null || "".equals(month)) {
+      start = getThisMonth();
+    } else {
+      start = parseMonthStr(month);
+    }
+    Date end = calcNextMonth(start);
+
+    List<ABItem> items = service.selectAll(start, end);
+    List<ABPayer> payers = service.selectAllPayers();
+    List<ABType> types = service.selectAllTypes();
+    ABStatistics stats = new ABStatistics(items, payers, types);
+
+    model.addAttribute("header", stats.getHeader());
+    model.addAttribute("map", stats.getMap());
+    return "stats_accountbook";
   }
 
   private Date getThisMonth() {

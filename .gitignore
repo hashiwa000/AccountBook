@@ -14,6 +14,7 @@ gradle-app.setting
 # gradle/wrapper/gradle-wrapper.properties
 
 *.log
+*.class
 db_production
 db_test
 tmp
