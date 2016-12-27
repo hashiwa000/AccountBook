@@ -23,27 +23,39 @@ Access http://localhost:8080/accountbook from your browser.
 
 ## How to use REST API
 
+At first, store authenticated cookies.
+
 ```
-$ curl -X POST -d 'date=2016-12-15&amount=1000&name=test&type=xxx' http://localhost:8080/rest/accountbook | python -m json.tool
+$ curl -X POST -d username=<username> -d password=<password> -c /tmp/cookies.jar http://localhost:8080/login
+
+$ file /tmp/cookies.jar
+/tmp/cookies.jar: Netscape cookie, ASCII text
+```
+
+And, do RESTful API by using the cookies.
+
+```
+$ curl -X POST -b /tmp/cookies.jar -d 'date=2016-12-15&amount=1000&name=test&type=xxx' http://localhost:8080/rest/accountbook | python -m json.tool
 {
     "amount": 1000,
     "date": 1481727600000,
     "description": "",
-    "id": 701,
+    "id": 1401,
     "name": "test",
     "remarks": "",
     "type": "xxx"
 }
 
-$ curl -X GET http://localhost:8080/rest/accountbook/701 | python -m json.tool
+$ curl -X GET -b /tmp/cookies.jar http://localhost:8080/rest/accountbook/1401 | python -m json.tool
 {
     "amount": 1000,
     "date": 1481727600000,
     "description": "",
-    "id": 701,
+    "id": 1401,
     "name": "test",
     "remarks": "",
     "type": "xxx"
 }
+
 ```
 
