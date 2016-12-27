@@ -9,7 +9,6 @@ public class DB {
     String sql = args[0];
     Connection conn = null;
     try {
-      Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
       String url = "jdbc:derby:/home/hashiwa/java/AccountBook/db_production;create=true;user=test;password=test";
       conn = DriverManager.getConnection(url);
       Statement stat = conn.createStatement();
