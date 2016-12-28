@@ -22,17 +22,15 @@ public class DB {
     }
   }
 
-  private static String createRowString(ResultSet result) {
+  private static String createRowString(ResultSet result) throws SQLException {
+    ResultSetMetaData metadata = result.getMetaData();
+    int columnCount = metadata.getColumnCount();
     StringBuilder buf = new StringBuilder();
-    for (int i=1 ;; i++) {
-      try {
-        String s = result.getString(i);
-        buf.append(s);
-        buf.append('\t');
-      } catch(SQLException e) {
-        break;
-      }
+    for (int i=1 ; i<=columnCount ; i++) {
+      String s = result.getString(i);
+      buf.append(s);
+      buf.append('\t');
     }
-    return buf.toString();
+    return buf.toString().trim();
   }
 }
