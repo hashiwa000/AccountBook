@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -37,7 +38,20 @@ public class ApplicationTest {
   }
 
   @Test
-  public void testTodoListShow() throws Exception {
+  public void testRedirect() throws Exception {
+    this.mockMvc.perform(get("/accountbook/"))
+      .andExpect(status().  is3xxRedirection());
+    this.mockMvc.perform(get("/accountbook/show"))
+      .andExpect(status().  is3xxRedirection());
+    this.mockMvc.perform(get("/accountbook/create"))
+      .andExpect(status().  is3xxRedirection());
+    this.mockMvc.perform(get("/accountbook/stats"))
+      .andExpect(status().  is3xxRedirection());
+  }
+
+  @Test
+  @WithMockUser(username="user")
+  public void testABItemShow() throws Exception {
     this.mockMvc.perform(get("/accountbook/show"))
       .andDo(print())
       .andExpect(status().isOk())
@@ -53,7 +67,8 @@ public class ApplicationTest {
   }
 
   @Test
-  public void testTodoListCreate() throws Exception {
+  @WithMockUser(username="user")
+  public void testABItemCreate() throws Exception {
     this.mockMvc.perform(get("/accountbook/create"))
       .andDo(print())
       .andExpect(status().isOk())
@@ -69,7 +84,8 @@ public class ApplicationTest {
   }
 
   @Test
-  public void testTodoListCreate2() throws Exception {
+  @WithMockUser(username="user")
+  public void testABItemCreate2() throws Exception {
     this.mockMvc.perform(post("/accountbook/create").param("date", "2016-12-15").param("amount", "1000").param("name", "test").param("type", "xxx").param("desc", "").param("remarks", ""))
       .andDo(print())
       .andExpect(status().isOk())
