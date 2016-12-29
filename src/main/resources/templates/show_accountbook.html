@@ -46,6 +46,7 @@
   <form name="logoutform" method="POST" th:action="@{/logout}">
     <input type="hidden" />
   </form>
+  <h2 th:text="${#dates.format(new java.util.Date(), 'yyyy/MM')}"></h2>
   <div class="col-md-6">
     <table class="table table-striped">
       <thead>
@@ -61,7 +62,7 @@
       </thead>
       <tbody>
         <tr th:each="item: ${items}">
-          <td th:text="${#dates.format(item.date, 'yyyy/MM/dd (E)')}"></td>
+          <td th:text="${#dates.format(item.date, 'dd(E)')}"></td>
           <td th:text="${item.amount}"></td>
           <td th:text="${item.name}"></td>
           <td th:text="${item.type}"></td>
