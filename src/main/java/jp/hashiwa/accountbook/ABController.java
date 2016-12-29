@@ -1,5 +1,6 @@
 package jp.hashiwa.accountbook;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,14 +26,18 @@ import jp.hashiwa.accountbook.statistics.ABStatistics;
 @RequestMapping("/")
 public class ABController {
 
+  private static final DateFormat MONTH_FORMAT = new SimpleDateFormat("yyyy-MM");
   private static final List<DateFormat> DATE_FORMATS = Arrays.<DateFormat>asList(
       new SimpleDateFormat("yyyy-MM-dd"),
       new SimpleDateFormat("yyyy/MM/dd")
     );
   private static final List<DateFormat> MONTH_FORMATS = Arrays.<DateFormat>asList(
-      new SimpleDateFormat("yyyy-MM"),
+      MONTH_FORMAT,
       new SimpleDateFormat("yyyy/MM")
     );
+
+  private ABItem oldestItem = null;
+  private ABItem newestItem = null;
 
   @Autowired
   ABService service;
@@ -53,10 +58,13 @@ public class ABController {
     } else {
       start = parseMonthStr(month);
     }
-    Date end = calcNextMonth(start);
-
+    Date end = calcMonthEnd(start);
     List<ABItem> items = service.selectAll(start, end);
     model.addAttribute("items", items);
+
+    List<String> months = getShowMonths();
+    model.addAttribute("months", months);
+    model.addAttribute("thisMonth", MONTH_FORMAT.format(start));
     return "show_accountbook";
   }
 
@@ -69,6 +77,7 @@ public class ABController {
     if (0 <= idToDelete) {
       service.delete(idToDelete);
     }
+    //TODO: update oldest/newest item
     return showAccountBook(month, model);
   }
 
@@ -94,6 +103,9 @@ public class ABController {
     Date d = parseDateStr(date);
     ABItem item = new ABItem(d, amount, name, type, desc, remarks);
     service.saveAndFlush(item);
+
+    updateOldestNewestItemIfNeeded(item);
+
     List<ABItem> items = Arrays.<ABItem>asList(item);
     model.addAttribute("created", items);
     return "created_accountbook";
@@ -110,7 +122,7 @@ public class ABController {
     } else {
       start = parseMonthStr(month);
     }
-    Date end = calcNextMonth(start);
+    Date end = calcMonthEnd(start);
 
     List<ABItem> items = service.selectAll(start, end);
     List<ABPayer> payers = service.selectAllPayers();
@@ -120,14 +132,16 @@ public class ABController {
     model.addAttribute("header", stats.getHeader());
     model.addAttribute("map", stats.getMap());
     model.addAttribute("checkout", stats.getCheckout());
+
+    List<String> months = getShowMonths();
+    model.addAttribute("months", months);
+    model.addAttribute("thisMonth", MONTH_FORMAT.format(start));
     return "stats_accountbook";
   }
 
   private Date getThisMonth() {
     Calendar c = Calendar.getInstance();
-    int year = c.get(Calendar.YEAR);
-    int month = c.get(Calendar.MONTH);
-    c.set(year, month, 0, 0, 0, 0);
+    setStartOfMonth(c);
     return c.getTime();
   }
 
@@ -155,10 +169,69 @@ public class ABController {
     throw lastException;
   }
 
-  private Date calcNextMonth(Date start) {
+  private Date calcMonthEnd(Date start) {
     Calendar endCalendar = Calendar.getInstance();
     endCalendar.setTime(start);
+    setStartOfMonth(endCalendar);
     endCalendar.add(Calendar.MONTH, 1);
+    endCalendar.add(Calendar.DAY_OF_MONTH, -1);
     return endCalendar.getTime();
+  }
+
+  private List<String> getShowMonths() {
+    Date oldestDate = getOldestDate();
+    Date newestDate = getNewestDate();
+
+    Calendar newest = Calendar.getInstance();
+    newest.setTime(newestDate);
+
+    Calendar c = Calendar.getInstance();
+    c.setTime(oldestDate);
+    setStartOfMonth(c);
+
+    List<String> months = new ArrayList<>();
+    while (c.compareTo(newest) <= 0) {
+      String month = MONTH_FORMAT.format(c.getTime());
+      months.add(month);
+      c.add(Calendar.MONTH, 1);
+    }
+    return months;
+  }
+
+  private Date getOldestDate() {
+    synchronized  (this) {
+      if (oldestItem == null) {
+        oldestItem = service.selectOldest();
+      }
+    }
+    return oldestItem.getDate();
+  }
+
+  private Date getNewestDate() {
+    synchronized  (this) {
+      if (newestItem == null) {
+        newestItem = service.selectNewest();
+      }
+    }
+    return newestItem.getDate();
+  }
+
+  private void setStartOfMonth(Calendar c) {
+    c.set(
+        c.get(Calendar.YEAR),
+        c.get(Calendar.MONTH),
+        1, //dateOfMonth
+        0, //hourOfDate
+        0, //minute
+        0  //second
+      );
+  }
+
+  private void updateOldestNewestItemIfNeeded(ABItem item) {
+    Date oldest = oldestItem.getDate();
+    Date newest = newestItem.getDate();
+    Date added = item.getDate();
+    if (oldest.after(added)) oldestItem = item;
+    if (newest.before(added)) newestItem = item;
   }
 }

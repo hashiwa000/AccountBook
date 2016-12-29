@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ABItemRepository extends JpaRepository<ABItem, Long> {
   public ABItem findById(long id);
   public List<ABItem> findByDateBetween(Date start, Date end, Sort sort);
+  public ABItem findFirstByOrderByDateAsc();
+  public ABItem findFirstByOrderByDateDesc();
 }

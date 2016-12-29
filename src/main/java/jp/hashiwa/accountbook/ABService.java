@@ -34,6 +34,14 @@ public class ABService {
     return itemRepo.findById(id);
   }
 
+  public ABItem selectOldest() {
+    return itemRepo.findFirstByOrderByDateAsc();
+  }
+
+  public ABItem selectNewest() {
+    return itemRepo.findFirstByOrderByDateDesc();
+  }
+
   public void saveAndFlush(ABItem item) {
     itemRepo.saveAndFlush(item);
   }

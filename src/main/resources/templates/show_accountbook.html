@@ -46,7 +46,12 @@
   <form name="logoutform" method="POST" th:action="@{/logout}">
     <input type="hidden" />
   </form>
-  <h2 th:text="${#dates.format(new java.util.Date(), 'yyyy/MM')}"></h2>
+  <form name="selectmonthform" method="GET" action="/accountbook/show">
+    <select class="selectpicker" name="month" onChange="this.form.submit()">
+      <option th:each="month: ${months}" th:text="${month}" th:selected="${month.equals(thisMonth)}"></option>
+    </select>
+  </form>
+
   <div class="col-md-6">
     <table class="table table-striped">
       <thead>
