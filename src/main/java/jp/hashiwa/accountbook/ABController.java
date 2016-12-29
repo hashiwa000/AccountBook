@@ -53,7 +53,7 @@ public class ABController {
       Model model) throws Exception
   {
     Date start;
-    if (month == null || "".equals(month)) {
+    if (month == null || "".equals(month.trim())) {
       start = getThisMonth();
     } else {
       start = parseMonthStr(month);
