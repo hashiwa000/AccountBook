@@ -45,3 +45,8 @@ dependencies {
 
 jar.baseName = 'account-book'
 
+task cleanTestDatabase(type: Delete) {
+    delete '/home/hashiwa/java/AccountBook/db_test'
+}
+
+test.dependsOn cleanTestDatabase

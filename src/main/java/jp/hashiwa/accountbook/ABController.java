@@ -36,8 +36,8 @@ public class ABController {
       new SimpleDateFormat("yyyy/MM")
     );
 
-  private ABItem oldestItem = null;
-  private ABItem newestItem = null;
+  private Date oldestItemDate = null;
+  private Date newestItemDate = null;
 
   @Autowired
   ABService service;
@@ -200,20 +200,32 @@ public class ABController {
 
   private Date getOldestDate() {
     synchronized  (this) {
-      if (oldestItem == null) {
-        oldestItem = service.selectOldest();
+      if (oldestItemDate == null) {
+        ABItem item = service.selectOldest();
+        if (item != null) {
+          oldestItemDate = item.getDate();
+        }
+      }
+      if (oldestItemDate == null) {
+        oldestItemDate = getThisMonth();
       }
     }
-    return oldestItem.getDate();
+    return oldestItemDate;
   }
 
   private Date getNewestDate() {
     synchronized  (this) {
-      if (newestItem == null) {
-        newestItem = service.selectNewest();
+      if (newestItemDate == null) {
+        ABItem item = service.selectNewest();
+        if (item != null) {
+          newestItemDate = item.getDate();
+        }
+      }
+      if (newestItemDate == null) {
+        newestItemDate = getThisMonth();
       }
     }
-    return newestItem.getDate();
+    return newestItemDate;
   }
 
   private void setStartOfMonth(Calendar c) {
@@ -228,10 +240,8 @@ public class ABController {
   }
 
   private void updateOldestNewestItemIfNeeded(ABItem item) {
-    Date oldest = oldestItem.getDate();
-    Date newest = newestItem.getDate();
     Date added = item.getDate();
-    if (oldest.after(added)) oldestItem = item;
-    if (newest.before(added)) newestItem = item;
+    if (oldestItemDate.after(added)) oldestItemDate = item.getDate();
+    if (newestItemDate.before(added)) newestItemDate = item.getDate();
   }
 }
