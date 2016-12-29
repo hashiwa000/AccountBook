@@ -119,6 +119,7 @@ public class ABController {
 
     model.addAttribute("header", stats.getHeader());
     model.addAttribute("map", stats.getMap());
+    model.addAttribute("checkout", stats.getCheckout());
     return "stats_accountbook";
   }
 

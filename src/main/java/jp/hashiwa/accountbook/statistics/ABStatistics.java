@@ -1,6 +1,7 @@
 package jp.hashiwa.accountbook.statistics;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,11 +13,14 @@ import jp.hashiwa.accountbook.ABPayer;
 import jp.hashiwa.accountbook.ABType;
 
 public class ABStatistics {
+  private static final List<String> IGNORE_TYPES = Arrays.asList("その他");
+
   private List<ABItem> items;
   private List<ABPayer> payers;
   private List<ABType> types;
   private List<String> header = new ArrayList<>();
   private Map<String, Map<String, Long>> map = new LinkedHashMap<>();
+  private Map<String, Long> checkout = new LinkedHashMap<>();
 
   public ABStatistics(
       List<ABItem> items,
@@ -26,12 +30,14 @@ public class ABStatistics {
     this.items = items;
     this.payers = payers;
     this.types = types;
-    initMap();
+    this.map = initMap();
+    this.checkout = initCheckout();
   }
 
-  private void initMap() {
-    //TODO: use stream
+  private Map<String, Map<String, Long>> initMap() {
+    Map<String, Map<String, Long>> map = new LinkedHashMap<>();
 
+    //TODO: use stream
     for (ABType type: types) {
       String typeName = type.getName();
       header.add(typeName);
@@ -73,9 +79,41 @@ public class ABStatistics {
         .sum();
       row.put("Total", sum);
     }
+
+    return map;
+  }
+
+  private Map<String, Long> initCheckout() {
+    //TODO: use stream
+    Map<String, Long> checkout = new LinkedHashMap<>();
+    int payerCount = payers.size();
+
+    Map<String, Long> payed = new LinkedHashMap<>();
+    for (ABPayer payer: payers) {
+      String payerName = payer.getName();
+      long sum = items.stream()
+        .filter(item -> !IGNORE_TYPES.contains(item.getType()))
+        .filter(item -> item.getName().equals(payerName))
+        .mapToLong(item -> item.getAmount())
+        .sum();
+      payed.put(payerName, sum);
+    }
+
+    long total = payed.entrySet().stream()
+      .mapToLong(e -> e.getValue())
+      .sum();
+    long divided = total/payerCount;
+
+    for (String payerName: payed.keySet()) {
+      long v = payed.get(payerName);
+      checkout.put(payerName, divided - v);
+    }
+
+    return checkout;
   }
 
   public List<String> getHeader() { return header; }
   public Map<String, Map<String, Long>> getMap() { return map; }
+  public Map<String, Long> getCheckout() { return checkout; }
 }
 
