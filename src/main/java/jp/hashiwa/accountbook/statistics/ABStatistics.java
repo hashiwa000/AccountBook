@@ -15,8 +15,8 @@ public class ABStatistics {
   private List<ABItem> items;
   private List<ABPayer> payers;
   private List<ABType> types;
-  private List<String> header = new ArrayList();
-  private Map<String, Map<String, Long>> map = new HashMap<>();
+  private List<String> header = new ArrayList<>();
+  private Map<String, Map<String, Long>> map = new LinkedHashMap<>();
 
   public ABStatistics(
       List<ABItem> items,
@@ -26,7 +26,10 @@ public class ABStatistics {
     this.items = items;
     this.payers = payers;
     this.types = types;
+    initMap();
+  }
 
+  private void initMap() {
     //TODO: use stream
 
     for (ABType type: types) {
@@ -37,11 +40,11 @@ public class ABStatistics {
     for (ABPayer payer: payers) {
       String payerName = payer.getName();
       Map<String, Long> columns = new LinkedHashMap<>();
-      //columns.put("Total", 0L);
       for (ABType type: types) {
         String typeName = type.getName();
         columns.put(typeName, 0L);
       }
+      columns.put("Total", 0L);
       map.put(payerName, columns);
     }
 
@@ -51,6 +54,24 @@ public class ABStatistics {
       String type = item.getType();
       Map<String, Long> columns = map.get(payerName);
       columns.put(type, columns.get(type) + amount);
+    }
+
+    Map<String, Long> totals = new LinkedHashMap<>();
+    for (ABType type: types) {
+      String typeName = type.getName();
+      long sum = map.entrySet().stream()
+        .mapToLong(e -> e.getValue().get(typeName))
+        .sum();
+      totals.put(typeName, sum);
+    }
+    map.put("Total", totals);
+
+    for (String payer: map.keySet()) {
+      Map<String, Long> row = map.get(payer);
+      long sum = row.values().stream()
+        .mapToLong(v -> (long)v)
+        .sum();
+      row.put("Total", sum);
     }
   }
 
