@@ -1,5 +1,5 @@
 # AccountBook
-Todo List with Spring Boot
+Home account book application.
 
 ## Environments
 
