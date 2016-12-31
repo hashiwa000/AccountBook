@@ -229,9 +229,12 @@ public class ABController {
   }
 
   private void setStartOfMonth(Calendar c) {
+    int year = c.get(Calendar.YEAR);
+    int month = c.get(Calendar.MONTH);
+    c.clear();
     c.set(
-        c.get(Calendar.YEAR),
-        c.get(Calendar.MONTH),
+        year,
+        month,
         1, //dateOfMonth
         0, //hourOfDate
         0, //minute
@@ -241,7 +244,7 @@ public class ABController {
 
   private void updateOldestNewestItemIfNeeded(ABItem item) {
     Date added = item.getDate();
-    if (oldestItemDate.after(added)) oldestItemDate = item.getDate();
-    if (newestItemDate.before(added)) newestItemDate = item.getDate();
+    if (oldestItemDate == null || oldestItemDate.after(added)) oldestItemDate = item.getDate();
+    if (newestItemDate == null || newestItemDate.before(added)) newestItemDate = item.getDate();
   }
 }
