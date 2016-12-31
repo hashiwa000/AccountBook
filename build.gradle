@@ -39,7 +39,6 @@ dependencies {
     testCompile 'org.springframework.security:spring-security-test'
 
     // utilities
-    //provided 'org.projectlombok:lombok'
     compile 'org.projectlombok:lombok'
 }
 
