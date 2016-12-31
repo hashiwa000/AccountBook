@@ -7,8 +7,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 @Entity
 @Table(name="account_book")
 public class ABItem {
@@ -23,11 +30,13 @@ public class ABItem {
   @Column(name="amount")
   private Long amount;
 
-  @Column(name="name")
-  private String name;
+  @OneToOne
+  @JoinColumn(name="payer_name_id")
+  private ABPayer payer;
 
-  @Column(name="type")
-  private String type;
+  @OneToOne
+  @JoinColumn(name="type_name_id")
+  private ABType type;
 
   @Column(name="description")
   private String description;
@@ -36,33 +45,18 @@ public class ABItem {
   private String remarks;
 
   public ABItem() {}
-  public ABItem(Date date, Long amount, String name, String type) {
-    this(date, amount, name, type, null, null);
+  public ABItem(Date date, Long amount, ABPayer payer, ABType type) {
+    this(date, amount, payer, type, null, null);
   }
-  public ABItem(Date date, Long amount, String name, String type, String description) {
-    this(date, amount, name, type, description, null);
+  public ABItem(Date date, Long amount, ABPayer payer, ABType type, String description) {
+    this(date, amount, payer, type, description, null);
   }
-  public ABItem(Date date, Long amount, String name, String type, String description, String remarks) {
+  public ABItem(Date date, Long amount, ABPayer payer, ABType type, String description, String remarks) {
     this.date = date;
     this.amount = amount;
-    this.name = name;
+    this.payer = payer;
     this.type = type;
     this.description = description;
     this.remarks = remarks;
   }
-
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
-  public Date getDate() { return date; }
-  public void setDate(Date date) { this.date = date; }
-  public Long getAmount() { return amount; }
-  public void setAmount(Long amount) { this.amount = amount; }
-  public String getName() { return name; }
-  public void setName(String name) { this.name = name; }
-  public String getType() { return type; }
-  public void setType(String type) { this.type = type; }
-  public String getDescription() { return description; }
-  public void setDescription(String description) { this.description = description; }
-  public String getRemarks() { return remarks; }
-  public void setRemarks(String remarks) { this.remarks = remarks; }
 }

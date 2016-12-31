@@ -55,9 +55,9 @@ public class ABStatistics {
     }
 
     for (ABItem item: items) {
-      String payerName = item.getName();
+      String payerName = item.getPayer().getName();
       long amount = item.getAmount();
-      String type = item.getType();
+      String type = item.getType().getName();
       Map<String, Long> columns = map.get(payerName);
       columns.put(type, columns.get(type) + amount);
     }
@@ -92,8 +92,8 @@ public class ABStatistics {
     for (ABPayer payer: payers) {
       String payerName = payer.getName();
       long sum = items.stream()
-        .filter(item -> !IGNORE_TYPES.contains(item.getType()))
-        .filter(item -> item.getName().equals(payerName))
+        .filter(item -> !IGNORE_TYPES.contains(item.getType().getName()))
+        .filter(item -> item.getPayer().getName().equals(payerName))
         .mapToLong(item -> item.getAmount())
         .sum();
       payed.put(payerName, sum);

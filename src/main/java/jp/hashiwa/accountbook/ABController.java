@@ -101,7 +101,15 @@ public class ABController {
       Model model) throws Exception
   {
     Date d = parseDateStr(date);
-    ABItem item = new ABItem(d, amount, name, type, desc, remarks);
+    ABPayer payer = service.selectOnePayer(name);
+    if (payer == null) {
+      throw new Exception("Payer is not found: " + name); // TODO: exception
+    }
+    ABType t = service.selectOneType(type);
+    if (t == null) {
+      throw new Exception("Type is not found: " + type); // TODO: exception
+    }
+    ABItem item = new ABItem(d, amount, payer, t, desc, remarks);
     service.saveAndFlush(item);
 
     updateOldestNewestItemIfNeeded(item);

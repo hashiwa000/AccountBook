@@ -3,7 +3,6 @@ package jp.hashiwa.accountbook;
 import java.util.List;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
  
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -44,11 +43,15 @@ public class ABRestController {
       @RequestParam("name") String name,
       @RequestParam("type") String type,
       @RequestParam(defaultValue = "") String desc,
-      @RequestParam(defaultValue = "") String remarks) throws ParseException
+      @RequestParam(defaultValue = "") String remarks) throws Exception
   {
     Date d = format.parse(date);
     long a = Long.parseLong(amount);
-    ABItem item = new ABItem(d, a, name, type, desc, remarks);
+    ABPayer payer = service.selectOnePayer(name);
+    if (payer == null) throw new Exception("Payer is not found: " + name); // TODO: exception
+    ABType t = service.selectOneType(type);
+    if (t == null) throw new Exception("Type is not found: " + type); // TODO: exception
+   ABItem item = new ABItem(d, a, payer, t, desc, remarks);
     service.saveAndFlush(item);
     return item;
   }

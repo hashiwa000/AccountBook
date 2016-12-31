@@ -54,12 +54,20 @@ public class ABService {
     return payerRepo.findAll();
   }
 
+  public ABPayer selectOnePayer(String name) {
+    return payerRepo.findByName(name);
+  }
+
   public void saveAndFlush(ABPayer payer) {
     payerRepo.saveAndFlush(payer);
   }
 
   public List<ABType> selectAllTypes() {
     return typeRepo.findAll();
+  }
+
+  public ABType selectOneType(String type) {
+    return typeRepo.findByName(type);
   }
 
   public void saveAndFlush(ABType type) {
