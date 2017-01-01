@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="payer_name")
+@Table(name="payer_info")
 public class ABPayer {
 
   @Id

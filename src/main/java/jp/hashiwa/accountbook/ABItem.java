@@ -31,11 +31,11 @@ public class ABItem {
   private Long amount;
 
   @OneToOne
-  @JoinColumn(name="payer_name_id")
+  @JoinColumn(name="payer_info_id")
   private ABPayer payer;
 
   @OneToOne
-  @JoinColumn(name="type_name_id")
+  @JoinColumn(name="type_info_id")
   private ABType type;
 
   @Column(name="description")

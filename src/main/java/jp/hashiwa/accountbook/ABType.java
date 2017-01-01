@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="type_name")
+@Table(name="type_info")
 public class ABType {
 
   @Id
