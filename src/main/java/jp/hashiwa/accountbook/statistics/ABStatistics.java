@@ -13,7 +13,6 @@ import jp.hashiwa.accountbook.ABPayer;
 import jp.hashiwa.accountbook.ABType;
 
 public class ABStatistics {
-  private static final List<String> IGNORE_TYPES = Arrays.asList("その他");
 
   private List<ABItem> items;
   private List<ABPayer> payers;
@@ -92,7 +91,7 @@ public class ABStatistics {
     for (ABPayer payer: payers) {
       String payerName = payer.getName();
       long sum = items.stream()
-        .filter(item -> !IGNORE_TYPES.contains(item.getType().getName()))
+        .filter(item -> item.getType().isLivingExpense())
         .filter(item -> item.getPayer().getName().equals(payerName))
         .mapToLong(item -> item.getAmount())
         .sum();

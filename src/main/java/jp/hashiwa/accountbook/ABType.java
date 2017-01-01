@@ -25,9 +25,13 @@ public class ABType {
   @Column(name="name")
   private String name;
 
+  @Column(name="living_expense")
+  private boolean livingExpense;
+
   public ABType() {}
-  public ABType(String name) {
+  public ABType(String name, boolean livingExpense) {
     this.name = name;
+    this.livingExpense = livingExpense;
   }
 
   public String toString() {

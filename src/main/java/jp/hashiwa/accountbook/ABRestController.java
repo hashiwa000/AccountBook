@@ -82,8 +82,11 @@ public class ABRestController {
 
   @RequestMapping(value="/type", method=RequestMethod.POST)
   @ResponseStatus(HttpStatus.CREATED)
-  public ABType postType(@RequestParam("name") String name) {
-    ABType type = new ABType(name);
+  public ABType postType(
+      @RequestParam("name") String name,
+      @RequestParam(defaultValue = "true") boolean livingExpense)
+  {
+    ABType type = new ABType(name, livingExpense);
     service.saveAndFlush(type);
     return type;
   }
