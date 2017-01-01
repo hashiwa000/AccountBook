@@ -44,6 +44,9 @@ public class ABItem {
   @Column(name="remarks")
   private String remarks;
 
+  @Column(name="record_at")
+  private Date recordAt;
+
   public ABItem() {}
   public ABItem(Date date, Long amount, ABPayer payer, ABType type) {
     this(date, amount, payer, type, null, null);
@@ -58,5 +61,6 @@ public class ABItem {
     this.type = type;
     this.description = description;
     this.remarks = remarks;
+    this.recordAt = new Date();
   }
 }
