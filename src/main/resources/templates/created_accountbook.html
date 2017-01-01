@@ -63,7 +63,7 @@
       </thead>
       <tbody>
         <tr th:each="item: ${created}">
-          <td th:text="${item.date}">title</td>
+          <td th:text="${#dates.format(item.date, 'yyyy/MM/dd(E)')}"></td>
           <td th:text="${item.amount}">title</td>
           <td th:text="${item.payer}">memo</td>
           <td th:text="${item.type}">deadline</td>
