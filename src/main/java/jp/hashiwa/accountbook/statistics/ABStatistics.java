@@ -42,17 +42,20 @@ public class ABStatistics {
       header.add(typeName);
     }
 
+    // list up rows
     for (ABPayer payer: payers) {
       String payerName = payer.getName();
-      Map<String, Long> columns = new LinkedHashMap<>();
+      Map<String, Long> rows = new LinkedHashMap<>();
+      // list up headers
       for (ABType type: types) {
         String typeName = type.getName();
-        columns.put(typeName, 0L);
+        rows.put(typeName, 0L);
       }
-      columns.put("Total", 0L);
-      map.put(payerName, columns);
+      rows.put("Total", 0L);
+      map.put(payerName, rows);
     }
 
+    // aggregate items
     for (ABItem item: items) {
       String payerName = item.getPayer().getName();
       long amount = item.getAmount();
@@ -61,6 +64,7 @@ public class ABStatistics {
       columns.put(type, columns.get(type) + amount);
     }
 
+    // calcurate total amount for each header
     Map<String, Long> totals = new LinkedHashMap<>();
     for (ABType type: types) {
       String typeName = type.getName();
@@ -71,6 +75,7 @@ public class ABStatistics {
     }
     map.put("Total", totals);
 
+    // calcurate total amount for each rows
     for (String payer: map.keySet()) {
       Map<String, Long> row = map.get(payer);
       long sum = row.values().stream()
