@@ -8,12 +8,14 @@ import java.util.stream.Collectors;
 import jp.hashiwa.accountbook.ABItem;
 import jp.hashiwa.accountbook.ABPayer;
 import jp.hashiwa.accountbook.ABType;
+import jp.hashiwa.accountbook.ABPlan;
 
 public class ABStatistics {
 
   private List<ABItem> items;
   private List<ABPayer> payers;
   private List<ABType> types;
+  private List<ABPlan> plans;
   private List<String> header;
   private Map<String, Map<String, Long>> map;
   private Map<String, Long> checkout;
@@ -21,11 +23,13 @@ public class ABStatistics {
   public ABStatistics(
       List<ABItem> items,
       List<ABPayer> payers,
-      List<ABType> types)
+      List<ABType> types,
+      List<ABPlan> plans)
   {
     this.items = items;
     this.payers = payers;
     this.types = types;
+    this.plans = plans;
     this.header = initHeader();
     this.map = initMap();
     this.checkout = initCheckout();
@@ -72,6 +76,33 @@ public class ABStatistics {
       totals.put(typeName, sum);
     }
     map.put("Total", totals);
+
+    // add row of planned amount
+    Map<String, Long> planned_columns = new LinkedHashMap<>();
+    for (ABType type: types) {
+      String typeName = type.getName();
+      List<Long> planned_or_none = plans.stream()
+        .filter(plan -> plan.getType().getId() == type.getId())
+        .mapToLong(plan -> plan.getAmount())
+        .boxed() // long -> Long
+        .collect(Collectors.toList());
+      long planned = planned_or_none.size() != 0
+        ? planned_or_none.get(0)
+        : 0;
+      planned_columns.put(typeName, planned);
+    }
+    map.put("Planned", planned_columns);
+
+    // add row of difference between actual and planned amount
+    Map<String, Long> diff_columns = new LinkedHashMap<>();
+    for (ABType type: types) {
+      String typeName = type.getName();
+      long actual = map.get("Total").get(typeName);
+      long planned = map.get("Planned").get(typeName);
+      long diff = actual - planned;
+      diff_columns.put(typeName, diff);
+    }
+    map.put("Diff", diff_columns);
 
     // calcurate total amount for each row
     for (String payer: map.keySet()) {

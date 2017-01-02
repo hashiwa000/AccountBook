@@ -209,7 +209,8 @@ public class ABController {
     List<ABItem> items = service.selectAll(start, end);
     List<ABPayer> payers = service.selectAllPayers();
     List<ABType> types = service.selectAllTypes();
-    ABStatistics stats = new ABStatistics(items, payers, types);
+    List<ABPlan> plans = service.selectAllPlans(start, end);
+    ABStatistics stats = new ABStatistics(items, payers, types, plans);
 
     model.addAttribute("header", stats.getHeader());
     model.addAttribute("map", stats.getMap());
