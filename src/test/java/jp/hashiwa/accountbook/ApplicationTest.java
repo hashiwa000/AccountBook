@@ -68,13 +68,13 @@ public class ApplicationTest {
 
   @Test
   @WithMockUser(username="user")
-  public void testABItemCreate() throws Exception {
+  public void testABItemCreateGet() throws Exception {
     this.mockMvc.perform(get("/accountbook/create"))
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().contentType(TEXT_HTML_UTF8))
       .andExpect(content().string(containsString("<title>Account Book</title>")))
-      .andExpect(content().string(containsString("<form action=\"/accountbook/create\" method=\"post\">")))
+      .andExpect(content().string(containsString("<form action=\"/accountbook/create\" method=\"POST\">")))
       .andExpect(content().string(containsString("<label for=\"inputDate\">Date</label>")))
       .andExpect(content().string(containsString("<label for=\"inputAmount\">Amount</label>")))
       .andExpect(content().string(containsString("<label for=\"inputName\">Name</label>")))
@@ -85,17 +85,71 @@ public class ApplicationTest {
 
   @Test
   @WithMockUser(username="user")
-  public void testABItemCreate2() throws Exception {
-    this.mockMvc.perform(post("/accountbook/create").param("date", "2016-12-15").param("amount", "1000").param("name", "test").param("type", "xxx").param("desc", "").param("remarks", ""))
+  public void testABItemCreatePost() throws Exception {
+    // before: add payer
+    this.mockMvc.perform(post("/rest/payer").param("name", "test_payer"))
+      .andDo(print())
+      .andExpect(status().isCreated());
+    this.mockMvc.perform(post("/rest/payer").param("name", "test2_payer"))
+      .andDo(print())
+      .andExpect(status().isCreated());
+    // before: add type
+    this.mockMvc.perform(post("/rest/type").param("name", "test_type"))
+      .andDo(print())
+      .andExpect(status().isCreated());
+    this.mockMvc.perform(post("/rest/type").param("name", "test2_type"))
+      .andDo(print())
+      .andExpect(status().isCreated());
+    // test
+    this.mockMvc.perform(
+        post("/accountbook/create")
+            .param("date", "2016-12-01")
+            .param("amount", "123456789")
+            .param("name", "test_payer")
+            .param("type", "test_type")
+            .param("desc", "test_desc")
+            .param("remarks", "test_remarks")
+        )
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().contentType(TEXT_HTML_UTF8))
       .andExpect(content().string(containsString("Created:")))
-      .andExpect(content().string(containsString("xxx")));
-    this.mockMvc.perform(get("/accountbook/show"))
+      .andExpect(content().string(containsString("123456789")))
+      .andExpect(content().string(containsString("test_payer")))
+      .andExpect(content().string(containsString("test_type")))
+      .andExpect(content().string(containsString("test_desc")))
+      .andExpect(content().string(containsString("test_remarks")));
+    this.mockMvc.perform(
+        post("/accountbook/create")
+            .param("date", "2016-12-31")
+            .param("amount", "-9876")
+            .param("name", "test2_payer")
+            .param("type", "test2_type")
+            .param("desc", "test2_desc")
+            .param("remarks", "test2_remarks")
+        )
       .andDo(print())
       .andExpect(status().isOk())
       .andExpect(content().contentType(TEXT_HTML_UTF8))
-      .andExpect(content().string(containsString("xxx")));
+      .andExpect(content().string(containsString("Created:")))
+      .andExpect(content().string(containsString("-9876")))
+      .andExpect(content().string(containsString("test2_payer")))
+      .andExpect(content().string(containsString("test2_type")))
+      .andExpect(content().string(containsString("test2_desc")))
+      .andExpect(content().string(containsString("test2_remarks")));
+    this.mockMvc.perform(get("/accountbook/show?month=2016-12"))
+      .andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(content().contentType(TEXT_HTML_UTF8))
+      .andExpect(content().string(containsString("123456789")))
+      .andExpect(content().string(containsString("test_payer")))
+      .andExpect(content().string(containsString("test_type")))
+      .andExpect(content().string(containsString("test_desc")))
+      .andExpect(content().string(containsString("test_remarks")))
+      .andExpect(content().string(containsString("-9876")))
+      .andExpect(content().string(containsString("test2_payer")))
+      .andExpect(content().string(containsString("test2_type")))
+      .andExpect(content().string(containsString("test2_desc")))
+      .andExpect(content().string(containsString("test2_remarks")));
   }
 }
