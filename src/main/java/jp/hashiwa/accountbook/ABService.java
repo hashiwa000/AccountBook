@@ -22,6 +22,9 @@ public class ABService {
   @Autowired
   ABTypeRepository typeRepo;
 
+  @Autowired
+  ABPlanRepository planRepo;
+
   public List<ABItem> selectAll() {
     return itemRepo.findAll(SORT);
   }
@@ -34,11 +37,11 @@ public class ABService {
     return itemRepo.findById(id);
   }
 
-  public ABItem selectOldest() {
+  public ABItem selectOldestItem() {
     return itemRepo.findFirstByOrderByDateAsc();
   }
 
-  public ABItem selectNewest() {
+  public ABItem selectNewestItem() {
     return itemRepo.findFirstByOrderByDateDesc();
   }
 
@@ -72,6 +75,34 @@ public class ABService {
 
   public void saveAndFlush(ABType type) {
     typeRepo.saveAndFlush(type);
+  }
+
+  public ABPlan selectOnePlan(Date month, ABType type) {
+    return planRepo.findFirstByMonthAndType(month, type);
+  }
+
+  public void saveAndFlush(ABPlan plan) {
+    planRepo.saveAndFlush(plan);
+  }
+
+  public List<ABPlan> selectAllPlans(Date start, Date end) {
+    return planRepo.findAllByMonthBetween(start, end);
+  }
+
+  public List<ABPlan> selectAllPlans(Date month) {
+    return planRepo.findAllByMonth(month);
+  }
+
+  public List<ABPlan> selectAllPlans() {
+    return planRepo.findAll();
+  }
+
+  public ABPlan selectOldestPlan() {
+    return planRepo.findFirstByOrderByMonthAsc();
+  }
+
+  public ABPlan selectNewestPlan() {
+    return planRepo.findFirstByOrderByMonthDesc();
   }
 
 }

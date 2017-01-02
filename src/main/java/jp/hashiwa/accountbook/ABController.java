@@ -6,9 +6,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.text.DateFormat;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.text.SimpleDateFormat;
- 
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,9 +39,6 @@ public class ABController {
       new SimpleDateFormat("yyyy/MM")
     );
 
-  private Date oldestItemDate = null;
-  private Date newestItemDate = null;
-
   @Autowired
   ABService service;
 
@@ -47,6 +47,82 @@ public class ABController {
     return "login";
   }
  
+  @RequestMapping(value="/plan/show", method=RequestMethod.GET)
+  public String showPlan(
+      @RequestParam(defaultValue = "") String month,
+      Model model) throws Exception
+  {
+    Date start;
+    if (month == null || "".equals(month.trim())) {
+      start = getThisMonth();
+    } else {
+      start = parseMonthStr(month);
+    }
+    Date end = calcMonthEnd(start);
+    List<ABPlan> plans = service.selectAllPlans(start, end);
+    model.addAttribute("plans", plans);
+
+    List<String> months = getShowMonths();
+    model.addAttribute("months", months);
+    model.addAttribute("thisMonth", MONTH_FORMAT.format(start));
+    return "show_plan_accountbook";
+  }
+
+  @RequestMapping(value="/plan/create", method=RequestMethod.GET)
+  public String createPlan(
+      @RequestParam(defaultValue = "") String month,
+      Model model) throws Exception
+  {
+    Date start;
+    if (month == null || "".equals(month.trim())) {
+      start = getThisMonth();
+    } else {
+      start = parseMonthStr(month);
+    }
+    Date end = calcMonthEnd(start);
+    List<ABPlan> plans = service.selectAllPlans(start, end);
+    List<ABType> types = service.selectAllTypes();
+    if (plans.size() < types.size()) {
+      for (ABType type: types) {
+        boolean exist = plans.stream()
+          .map(plan -> plan.getType())
+          .anyMatch(t -> t.getId() == type.getId());
+        if (!exist) {
+          plans.add(new ABPlan(start, type, 0L));
+        }
+      }
+    }
+    model.addAttribute("plans", plans);
+    model.addAttribute("thisMonth", MONTH_FORMAT.format(start));
+    return "create_plan_accountbook";
+  }
+
+  @RequestMapping(value="/plan/create", method=RequestMethod.POST)
+  public String createPlan(
+      HttpServletRequest request,
+      Model model) throws Exception
+  {
+    Map map = request.getParameterMap();
+    String month = ((String[])map.get("month"))[0];
+    Date monthDate = parseMonthStr(month);
+    List<ABType> types = service.selectAllTypes();
+    for (ABType type: types) {
+      long id = type.getId();
+      String key = "type_" + id;
+      String value = ((String[])map.get(key))[0];
+      long amount = Long.parseLong(value);
+      ABPlan plan = service.selectOnePlan(monthDate, type);
+      if (plan == null) {
+        plan = new ABPlan(monthDate, type, amount);
+        service.saveAndFlush(plan);
+      } else if (plan.getAmount() != amount) {
+        plan.setAmount(amount);
+        service.saveAndFlush(plan);
+      }
+    }
+    return showPlan(month, model);
+  }
+
   @RequestMapping(value="/accountbook/show", method=RequestMethod.GET)
   public String showAccountBook(
       @RequestParam(defaultValue = "") String month,
@@ -111,8 +187,6 @@ public class ABController {
     }
     ABItem item = new ABItem(d, amount, payer, t, desc, remarks);
     service.saveAndFlush(item);
-
-    updateOldestNewestItemIfNeeded(item);
 
     List<ABItem> items = Arrays.<ABItem>asList(item);
     model.addAttribute("created", items);
@@ -207,33 +281,49 @@ public class ABController {
   }
 
   private Date getOldestDate() {
-    synchronized  (this) {
-      if (oldestItemDate == null) {
-        ABItem item = service.selectOldest();
-        if (item != null) {
-          oldestItemDate = item.getDate();
-        }
-      }
-      if (oldestItemDate == null) {
-        oldestItemDate = getThisMonth();
-      }
+    Date oldestDate = null;
+    // decide oldest date from database record
+    ABItem item = service.selectOldestItem();
+    ABPlan plan = service.selectOldestPlan();
+    if (item != null && plan != null) {
+      Date itemDate = item.getDate();
+      Date planDate = plan.getMonth();
+      oldestDate = itemDate.before(planDate)
+        ? itemDate
+        : planDate;
+    } else if (item != null) {
+      oldestDate = item.getDate();
+    } else if (plan != null) {
+      oldestDate = plan.getMonth();
     }
-    return oldestItemDate;
+    if (oldestDate == null) {
+      // if no record found, oldest date is this month
+      oldestDate = getThisMonth();
+    }
+    return oldestDate;
   }
 
   private Date getNewestDate() {
-    synchronized  (this) {
-      if (newestItemDate == null) {
-        ABItem item = service.selectNewest();
-        if (item != null) {
-          newestItemDate = item.getDate();
-        }
-      }
-      if (newestItemDate == null) {
-        newestItemDate = getThisMonth();
-      }
+    Date newestDate = null;
+    // decide newest date from database record
+    ABItem item = service.selectNewestItem();
+    ABPlan plan = service.selectNewestPlan();
+    if (item != null && plan != null) {
+      Date itemDate = item.getDate();
+      Date planDate = plan.getMonth();
+      newestDate = itemDate.after(planDate)
+        ? itemDate
+        : planDate;
+    } else if (item != null) {
+      newestDate = item.getDate();
+    } else if (plan != null) {
+      newestDate = plan.getMonth();
     }
-    return newestItemDate;
+    if (newestDate == null) {
+      // if no record found, newest date is this month
+      newestDate = getThisMonth();
+    }
+    return newestDate;
   }
 
   private void setStartOfMonth(Calendar c) {
@@ -250,9 +340,4 @@ public class ABController {
       );
   }
 
-  private void updateOldestNewestItemIfNeeded(ABItem item) {
-    Date added = item.getDate();
-    if (oldestItemDate == null || oldestItemDate.after(added)) oldestItemDate = item.getDate();
-    if (newestItemDate == null || newestItemDate.before(added)) newestItemDate = item.getDate();
-  }
 }

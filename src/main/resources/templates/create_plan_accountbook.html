@@ -22,10 +22,10 @@
       </div>
       <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="#">Add item</a></li>
+          <li><a href="/accountbook/create">Add item</a></li>
           <li><a href="/accountbook/show">Show Items</a></li>
           <li><a href="/accountbook/stats">Show Statistics</a></li>
-          <li><a href="/plan/create">Update plan</a></li>
+          <li class="active"><a href="#">Update plan</a></li>
           <li><a href="/plan/show">Show plans</a></li>
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tools<span class="caret"></span></a>
@@ -37,6 +37,7 @@
               <li class="dropdown-header">Nav header</li>
               <li><a href="#">Separated link</a></li>
               <li><a href="#">One more separated link</a></li>
+              <li role="separator" class="divider"></li>
               <li><a href="" onclick="document.logoutform.submit();return false;">Log out</a></li>
             </ul>
           </li>
@@ -48,40 +49,32 @@
     <input type="hidden" />
   </form>
 
-  <!-- Begin page content -->
-  <div class="container">
-    <form action="/accountbook/create" method="POST">
+  <div class="col-md-6">
       <div class="form-group">
-        <label for="inputDate">Date</label>
-          <input type="date" name="date" class="form-control" id="inputDate" aria-describedby="dateHelp" placeholder="yyyy-MM-dd" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" required="true" />
-        <small id="dateHelp" class="form-text text-muted">Date is yyyy-MM-dd.</small>
-      </div>
-      <div class="form-group">
-        <label for="inputAmount">Amount</label>
-        <input type="text" name="amount" class="form-control" id="inputAmount" aria-describedby="amountHelp" placeholder="Enter amount" pattern="[-]?[1-9][0-9]*" required="true" />
-      </div>
-      <div class="form-group">
-        <label for="inputName">Name</label>
-        <select class="selectpicker" name="name">
-          <option th:each="payer: ${payers}" th:value="${payer.name}" th:text="${payer.name}"></option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="inputType">Type</label>
-        <select class="selectpicker" name="type">
-          <option th:each="type: ${types}" th:value="${type.name}" th:text="${type.name}"></option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="inputDesc">Description</label>
-        <input type="text" name="desc" class="form-control" id="inputDesc" aria-describedby="descHelp" placeholder="Enter description" />
-      </div>
-      <div class="form-group">
-        <label for="inputRemarks">Remarks</label>
-        <input type="text" name="remarks" class="form-control" id="inputRemarks" aria-describedby="remarkstHelp" placeholder="Enter remarks" />
-      </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+        <label for="inputDate">Month</label>
+        <form name="selectmonthform" method="GET" action="/plan/create">
+          <input type="month" name="month" th:value="${thisMonth}" class="form-control" id="month" aria-describedby="monthHelp" placeholder="yyyy-MM" pattern="[0-9]{4}-[0-9]{2}" required="true" onChange="this.form.submit()" />
+          <small id="monthHelp" class="form-text text-muted">Month is yyyy-MM.</small>
+        </form>
+        <form name="planform" method="POST" action="/plan/create">
+          <input type="hidden" name="month" th:value="${thisMonth}" />
+          <table class="table table-striped" id="plan_table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="plan: ${plans}">
+                <td th:text="${plan.type}"></td>
+                <td><input type="text" th:name="'type_'+${plan.type.id}" th:value="${plan.amount}" pattern="[-]?[0-9]*" required="true" /></td>
+              </tr>
+            </tbody>
+          </table>
+        <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
   </div>
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
