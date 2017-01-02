@@ -1,12 +1,9 @@
 package jp.hashiwa.accountbook.statistics;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import jp.hashiwa.accountbook.ABItem;
 import jp.hashiwa.accountbook.ABPayer;
@@ -17,9 +14,9 @@ public class ABStatistics {
   private List<ABItem> items;
   private List<ABPayer> payers;
   private List<ABType> types;
-  private List<String> header = new ArrayList<>();
-  private Map<String, Map<String, Long>> map = new LinkedHashMap<>();
-  private Map<String, Long> checkout = new LinkedHashMap<>();
+  private List<String> header;
+  private Map<String, Map<String, Long>> map;
+  private Map<String, Long> checkout;
 
   public ABStatistics(
       List<ABItem> items,
@@ -29,18 +26,19 @@ public class ABStatistics {
     this.items = items;
     this.payers = payers;
     this.types = types;
+    this.header = initHeader();
     this.map = initMap();
     this.checkout = initCheckout();
   }
 
+  private List<String> initHeader() {
+    return types.stream()
+      .map(type -> type.getName())
+      .collect(Collectors.toList());
+  }
+
   private Map<String, Map<String, Long>> initMap() {
     Map<String, Map<String, Long>> map = new LinkedHashMap<>();
-
-    //TODO: use stream
-    for (ABType type: types) {
-      String typeName = type.getName();
-      header.add(typeName);
-    }
 
     // list up rows
     for (ABPayer payer: payers) {
@@ -75,7 +73,7 @@ public class ABStatistics {
     }
     map.put("Total", totals);
 
-    // calcurate total amount for each rows
+    // calcurate total amount for each row
     for (String payer: map.keySet()) {
       Map<String, Long> row = map.get(payer);
       long sum = row.values().stream()
