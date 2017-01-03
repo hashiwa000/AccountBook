@@ -1,9 +1,0 @@
-spring:
-  datasource:
-    url: jdbc:derby:/home/hashiwa/java/AccountBook/db_production;create=true
-    username: test
-    password: test
-    driverClassName: org.apache.derby.jdbc.EmbeddedDriver
-  jpa:
-    hibernate:
-      ddl-auto: update

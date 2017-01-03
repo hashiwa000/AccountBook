@@ -13,10 +13,46 @@ Home account book application.
 ```
 $ git clone https://github.com/hashiwa000/AccountBook.git
 $ cd AccountBook
-$ vi src/main/resources/config/application.yml (edit database url)
-$ vi src/test/resources/config/application.yml (edit database url)
+$ mkdir -p src/main/resources/config
+$ cat > src/main/resources/config/application.yml <<EOF
+spring:
+  datasource:
+    url: <database url for production>
+    username: <database username>
+    password: <database password>
+    driverClassName: <driver class name>
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+$ mkdir -p src/test/resources/config
+$ cat > src/test/resources/config/application.yml <<EOF
+spring:
+  datasource:
+    url: <database url for test>
+    username: <database username>
+    password: <database password>
+    driverClassName: <driver class name>
+  jpa:
+    hibernate:
+      ddl-auto: update
+
 $ gradle test
 $ gradle bootRun
+```
+
+For example, if you use JavaDB(Apache Derby), application.yml is as follows:
+
+```
+spring:
+  datasource:
+    url: jdbc:derby:/path/to/database/directory;create=true
+    username: test
+    password: test
+    driverClassName: org.apache.derby.jdbc.EmbeddedDriver
+  jpa:
+    hibernate:
+      ddl-auto: update
 ```
 
 Access http://localhost:8080/accountbook from your browser.
