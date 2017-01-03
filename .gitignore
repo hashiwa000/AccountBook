@@ -13,7 +13,11 @@ gradle-app.setting
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
 
+# Ignore config files
+**/application.yml
+
 *.log
+
 *.class
 db_production
 db_test
