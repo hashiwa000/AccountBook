@@ -11,7 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ABService {
-  private static final Sort SORT = new Sort(Sort.Direction.ASC, "date", "id");
+  private static final Sort ITEM_SORT = new Sort(Sort.Direction.ASC, "date", "id");
+  private static final Sort PLAN_SORT = new Sort(Sort.Direction.ASC, "id");
 
   @Autowired
   ABItemRepository itemRepo;
@@ -26,11 +27,11 @@ public class ABService {
   ABPlanRepository planRepo;
 
   public List<ABItem> selectAll() {
-    return itemRepo.findAll(SORT);
+    return itemRepo.findAll(ITEM_SORT);
   }
 
   public List<ABItem> selectAll(Date start, Date end) {
-    return itemRepo.findByDateBetween(start, end, SORT);
+    return itemRepo.findByDateBetween(start, end, ITEM_SORT);
   }
 
   public ABItem select(long id) {
@@ -86,15 +87,15 @@ public class ABService {
   }
 
   public List<ABPlan> selectAllPlans(Date start, Date end) {
-    return planRepo.findAllByMonthBetween(start, end);
+    return planRepo.findAllByMonthBetween(start, end, PLAN_SORT);
   }
 
   public List<ABPlan> selectAllPlans(Date month) {
-    return planRepo.findAllByMonth(month);
+    return planRepo.findAllByMonth(month, PLAN_SORT);
   }
 
   public List<ABPlan> selectAllPlans() {
-    return planRepo.findAll();
+    return planRepo.findAll(PLAN_SORT);
   }
 
   public ABPlan selectOldestPlan() {
