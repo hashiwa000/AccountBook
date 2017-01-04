@@ -67,6 +67,10 @@
           <td th:text="${plan.type}"></td>
           <td th:text="${plan.amount}"></td>
         </tr>
+        <tr>
+          <td>Total</td>
+          <td th:text="${#aggregates.sum(plans.![amount])}"></td>
+        </tr>
       </tbody>
     </table>
   </div>

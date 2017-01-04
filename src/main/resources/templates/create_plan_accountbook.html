@@ -70,6 +70,10 @@
                 <td th:text="${plan.type}"></td>
                 <td><input type="text" th:name="'type_'+${plan.type.id}" th:value="${plan.amount}" pattern="[-]?[0-9]*" required="true" /></td>
               </tr>
+              <tr>
+                <td>Total</td>
+                <td><input type="text" th:value="${#aggregates.sum(plans.![amount])}" readonly="readonly" /></td>
+              </tr>
             </tbody>
           </table>
         <button type="submit" class="btn btn-primary">Submit</button>
