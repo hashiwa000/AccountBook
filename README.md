@@ -24,6 +24,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+EOF
 
 $ mkdir -p src/test/resources/config
 $ cat > src/test/resources/config/application.yml <<EOF
@@ -36,6 +37,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+EOF
 
 $ gradle test
 $ gradle bootRun
