@@ -147,27 +147,40 @@ public class ABController {
   @RequestMapping(value="/accountbook/show", method=RequestMethod.POST)
   public String showAccountBook(
       @RequestParam(defaultValue = "") String month,
-      @RequestParam(defaultValue = "-1") int idToDelete,
+      @RequestParam(defaultValue = "-1") long idToUpdate,
+      @RequestParam(defaultValue = "-1") long idToDelete,
       Model model) throws Exception
   {
     if (0 <= idToDelete) {
       service.delete(idToDelete);
     }
-    //TODO: update oldest/newest item
+    if (0 <= idToUpdate) {
+      return createAccountBook(idToUpdate, model);
+    }
     return showAccountBook(month, model);
   }
 
   @RequestMapping(value="/accountbook/create", method=RequestMethod.GET)
-  public String createAccountBook(Model model) {
+  public String createAccountBook(
+      @RequestParam(defaultValue = "-1") long idToUpdate,
+      Model model)
+  {
     List<ABPayer> payers = service.selectAllPayers();
     List<ABType> types = service.selectAllTypes();
     model.addAttribute("payers", payers);
     model.addAttribute("types", types);
+    if (0 <= idToUpdate) {
+      ABItem item = service.select(idToUpdate);
+      if (item != null) {
+        model.addAttribute("item", item);
+      }
+    }
     return "create_accountbook";
   }
 
   @RequestMapping(value="/accountbook/create", method=RequestMethod.POST)
   public String createAccountBook(
+      @RequestParam(defaultValue = "-1") long id,
       @RequestParam("date") String date,
       @RequestParam("amount") long amount,
       @RequestParam("name") String name,
@@ -185,7 +198,22 @@ public class ABController {
     if (t == null) {
       throw new Exception("Type is not found: " + type); // TODO: exception
     }
-    ABItem item = new ABItem(d, amount, payer, t, desc, remarks);
+    ABItem item = null;
+    if (0 <= id) {
+      item = service.select(id);
+    }
+    if (item != null) {
+      // update item
+      item.setDate(d);
+      item.setAmount(amount);
+      item.setPayer(payer);
+      item.setType(t);
+      item.setDescription(desc);
+      item.setRemarks(remarks);
+    } else {
+      // create new item
+      item = new ABItem(d, amount, payer, t, desc, remarks);
+    }
     service.saveAndFlush(item);
 
     List<ABItem> items = Arrays.<ABItem>asList(item);

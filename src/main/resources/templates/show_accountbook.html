@@ -69,6 +69,7 @@
           <th>Type</th>
           <th>Description</th>
           <th>Remarks</th>
+          <th><!-- update button --></th>
           <th><!-- delete button --></th>
         </tr>
       </thead>
@@ -82,7 +83,12 @@
           <td th:text="${item.remarks}"></td>
           <td>
             <form action="/accountbook/show" method="post">
-              <!-- TODO: add check dialog -->
+              <input type="hidden" name="idToUpdate" th:value="${item.id}" />
+              <button type="submit" class="btn btn-primary btn-sm">Update</button>
+            </form>
+          </td>
+          <td>
+            <form action="/accountbook/show" method="post">
               <input type="hidden" name="idToDelete" th:value="${item.id}" />
               <button type="submit" class="btn btn-danger btn-sm" onclick="return confirmDeleteItem();">Delete</button>
             </form>
