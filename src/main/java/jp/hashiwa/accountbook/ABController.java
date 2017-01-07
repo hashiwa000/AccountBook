@@ -103,13 +103,13 @@ public class ABController {
       Model model) throws Exception
   {
     Map map = request.getParameterMap();
-    String month = ((String[])map.get("month"))[0];
+    String month = ((String[])map.get("month"))[0]; //XXX:
     Date monthDate = parseMonthStr(month);
     List<ABType> types = service.selectAllTypes();
     for (ABType type: types) {
       long id = type.getId();
       String key = "type_" + id;
-      String value = ((String[])map.get(key))[0];
+      String value = ((String[])map.get(key))[0]; //XXX:
       long amount = Long.parseLong(value);
       ABPlan plan = service.selectOnePlan(monthDate, type);
       if (plan == null) {
