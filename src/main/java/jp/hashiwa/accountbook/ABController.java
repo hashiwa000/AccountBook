@@ -107,7 +107,7 @@ public class ABController {
     }
     model.addAttribute("plans", plans);
     model.addAttribute("thisMonth", MONTH_FORMAT.format(start));
-    return "create_plan_accountbook";
+    return "update_plan_accountbook";
   }
 
   @RequestMapping(value="/plan/create", method=RequestMethod.POST)
