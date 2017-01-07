@@ -72,7 +72,7 @@
               </tr>
               <tr>
                 <td>Total</td>
-                <td><input type="text" th:value="${#aggregates.sum(plans.![amount])}" readonly="readonly" /></td>
+                <td><input type="text" th:value="${#numbers.formatInteger(#aggregates.sum(plans.![amount]), 1, 'COMMA')}" readonly="readonly" /></td>
               </tr>
             </tbody>
           </table>

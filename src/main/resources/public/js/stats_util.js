@@ -20,7 +20,8 @@ function read_stats_table() {
   var columns = rows.item(3).cells; // Total value row
   for (var j=1 ; j<columns.length-1 ; j++) {
     var header = headers.item(j).textContent;
-    var value = Number(columns.item(j).textContent);
+    var valueStr = columns.item(j).textContent;
+    var value = Number(valueStr.replace(/,/g, ''));
     data.push({'label': header, 'y': value});
   }
 

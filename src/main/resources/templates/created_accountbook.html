@@ -64,11 +64,11 @@
       <tbody>
         <tr th:each="item: ${created}">
           <td th:text="${#dates.format(item.date, 'yyyy/MM/dd(E)')}"></td>
-          <td th:text="${item.amount}">title</td>
-          <td th:text="${item.payer}">memo</td>
-          <td th:text="${item.type}">deadline</td>
-          <td th:text="${item.description}">deadline</td>
-          <td th:text="${item.remarks}">deadline</td>
+          <td th:text="${#numbers.formatInteger(item.amount, 1, 'COMMA')}" align="right"></td>
+          <td th:text="${item.payer}"></td>
+          <td th:text="${item.type}"></td>
+          <td th:text="${item.description}"></td>
+          <td th:text="${item.remarks}"></td>
         </tr>
       </tbody>
     </table>

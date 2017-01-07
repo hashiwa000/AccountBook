@@ -76,7 +76,7 @@
       <tbody>
         <tr th:each="item: ${items}">
           <td th:text="${#dates.format(item.date, 'dd(E)')}"></td>
-          <td th:text="${item.amount}"></td>
+          <td th:text="${#numbers.formatInteger(item.amount, 1, 'COMMA')}" align="right"></td>
           <td th:text="${item.payer}"></td>
           <td th:text="${item.type}"></td>
           <td th:text="${item.description}"></td>

@@ -71,7 +71,7 @@
         <tbody>
           <tr th:each="entry: ${map}">
             <td th:text="${entry.getKey()}"></td>
-            <td th:each="column: ${entry.getValue()}" th:text="${column.getValue()}"></td>
+            <td th:each="column: ${entry.getValue()}" th:text="${#numbers.formatInteger(column.getValue(), 1, 'COMMA')}" align="right"></td>
           </tr>
         </tbody>
       </table>
@@ -91,7 +91,7 @@
         <tbody>
           <tr th:each="entry: ${checkout}">
             <td th:text="${entry.getKey()}"></td>
-            <td th:text="${entry.getValue()}"></td>
+            <td th:text="${#numbers.formatInteger(entry.getValue(), 1, 'COMMA')}" align="right"></td>
           </tr>
         </tbody>
       </table>

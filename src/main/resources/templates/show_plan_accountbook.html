@@ -65,11 +65,11 @@
       <tbody>
         <tr th:each="plan: ${plans}">
           <td th:text="${plan.type}"></td>
-          <td th:text="${plan.amount}"></td>
+          <td th:text="${#numbers.formatInteger(plan.amount, 1, 'COMMA')}" align="right"></td>
         </tr>
         <tr>
           <td>Total</td>
-          <td th:text="${#aggregates.sum(plans.![amount])}"></td>
+          <td th:text="${#numbers.formatInteger(#aggregates.sum(plans.![amount]), 1, 'COMMA')}" align="right"></td>
         </tr>
       </tbody>
     </table>
