@@ -1,14 +1,15 @@
 package jp.hashiwa.accountbook;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.text.DateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,6 +31,7 @@ import jp.hashiwa.accountbook.statistics.ABStatistics;
 public class ABController {
 
   private static final DateFormat MONTH_FORMAT = new SimpleDateFormat("yyyy-MM");
+  private static final DateFormat YEAR_FORMAT = new SimpleDateFormat("yyyy");
   private static final List<DateFormat> DATE_FORMATS = Arrays.<DateFormat>asList(
       new SimpleDateFormat("yyyy-MM-dd"),
       new SimpleDateFormat("yyyy/MM/dd")
@@ -37,6 +39,9 @@ public class ABController {
   private static final List<DateFormat> MONTH_FORMATS = Arrays.<DateFormat>asList(
       MONTH_FORMAT,
       new SimpleDateFormat("yyyy/MM")
+    );
+  private static final List<DateFormat> YEAR_FORMATS = Arrays.<DateFormat>asList(
+      YEAR_FORMAT
     );
 
   @Autowired
@@ -57,6 +62,10 @@ public class ABController {
       start = getThisMonth();
     } else {
       start = parseMonthStr(month);
+      if (start == null) {
+        //fall back to this month
+        start = getThisMonth();
+      }
     }
     Date end = calcMonthEnd(start);
     List<ABPlan> plans = service.selectAllPlans(start, end);
@@ -78,6 +87,10 @@ public class ABController {
       start = getThisMonth();
     } else {
       start = parseMonthStr(month);
+      if (start == null) {
+        //fall back to this month
+        start = getThisMonth();
+      }
     }
     Date end = calcMonthEnd(start);
     List<ABPlan> plans = service.selectAllPlans(start, end);
@@ -105,6 +118,9 @@ public class ABController {
     Map map = request.getParameterMap();
     String month = ((String[])map.get("month"))[0]; //XXX:
     Date monthDate = parseMonthStr(month);
+    if (monthDate == null) {
+      throw new Exception("Illegal month: " + monthDate); // exception
+    }
     List<ABType> types = service.selectAllTypes();
     for (ABType type: types) {
       long id = type.getId();
@@ -133,6 +149,10 @@ public class ABController {
       start = getThisMonth();
     } else {
       start = parseMonthStr(month);
+      if (start == null) {
+        //fall back to this month
+        start = getThisMonth();
+      }
     }
     Date end = calcMonthEnd(start);
     List<ABItem> items = service.selectAll(start, end);
@@ -190,6 +210,9 @@ public class ABController {
       Model model) throws Exception
   {
     Date d = parseDateStr(date);
+    if (d == null) {
+      throw new Exception("Date is not found: " + date); // TODO: exception
+    }
     ABPayer payer = service.selectOnePayer(name);
     if (payer == null) {
       throw new Exception("Payer is not found: " + name); // TODO: exception
@@ -223,31 +246,68 @@ public class ABController {
 
   @RequestMapping(value="/accountbook/stats", method=RequestMethod.GET)
   public String statsAccountBook(
-      @RequestParam(defaultValue = "") String month,
+      @RequestParam(defaultValue="") String period,
       Model model) throws Exception
   {
-    Date start;
-    if (month == null || "".equals(month)) {
-      start = getThisMonth();
-    } else {
-      start = parseMonthStr(month);
+    Object[] results;
+    if ((results=handleAsMonth(period)) != null) {}
+    else if ((results=handleAsYear(period)) != null) {}
+    else if ((results=handleAsNoPeriod()) != null) {}
+    else {
+      //should not reach here
+      throw new Error("Fatal Error");
     }
-    Date end = calcMonthEnd(start);
+
+    //TODO: can improve
+    Date start = (Date)results[0];
+    Date end = (Date)results[1];
+    String thisPeriod = (String)results[2];
 
     List<ABItem> items = service.selectAll(start, end);
+    List<ABPlan> plans = service.selectAllPlans(start, end);
     List<ABPayer> payers = service.selectAllPayers();
     List<ABType> types = service.selectAllTypes();
-    List<ABPlan> plans = service.selectAllPlans(start, end);
     ABStatistics stats = new ABStatistics(items, payers, types, plans);
 
     model.addAttribute("header", stats.getHeader());
     model.addAttribute("map", stats.getMap());
     model.addAttribute("checkout", stats.getCheckout());
 
-    List<String> months = getShowMonths();
-    model.addAttribute("months", months);
-    model.addAttribute("thisMonth", MONTH_FORMAT.format(start));
+    List<String> periods = new ArrayList<>();
+    periods.addAll(getShowYears());
+    periods.addAll(getShowMonths());
+    model.addAttribute("periods", periods);
+    model.addAttribute("thisPeriod", thisPeriod);
     return "stats_accountbook";
+  }
+
+  public Object[] handleAsMonth(String period) {
+    Date start = parseMonthStr(period);
+    if (start == null) {
+      // period is not month string.
+      return null;
+    }
+    Date end = calcMonthEnd(start);
+    String thisMonth = MONTH_FORMAT.format(start);
+    return new Object[] {start, end, thisMonth};
+  }
+
+  public Object[] handleAsYear(String period) {
+    Date start = parseYearStr(period);
+    if (start == null) {
+      // period is not year string.
+      return null;
+    }
+    Date end = calcYearEnd(start);
+    String thisYear = YEAR_FORMAT.format(start);
+    return new Object[] {start, end, thisYear};
+  }
+
+  public Object[] handleAsNoPeriod() {
+    Date start = getThisMonth();
+    Date end = calcMonthEnd(start);
+    String thisMonth = MONTH_FORMAT.format(start);
+    return new Object[] {start, end, thisMonth};
   }
 
   private Date getThisMonth() {
@@ -256,28 +316,43 @@ public class ABController {
     return c.getTime();
   }
 
-  private Date parseDateStr(String s) throws Exception {
-    Exception lastException = null;
-    for (DateFormat format: DATE_FORMATS) {
-      try {
-        return format.parse(s);
-      } catch(Exception e) {
-        lastException = e;
-      }
-    }
-    throw lastException;
+  private Date getThisYear() {
+    Calendar c = Calendar.getInstance();
+    setStartOfYear(c);
+    return c.getTime();
   }
 
-  private Date parseMonthStr(String s) throws Exception {
-    Exception lastException = null;
-    for (DateFormat format: MONTH_FORMATS) {
+  private Date parseDateStr(String s) {
+    return parseStr(s, DATE_FORMATS);
+  }
+
+  private Date parseMonthStr(String s) {
+    return parseStr(s, MONTH_FORMATS);
+  }
+
+  private Date parseYearStr(String s) {
+    return parseStr(s, YEAR_FORMATS);
+  }
+
+  private Date parseStr(String s, List<DateFormat> formats) {
+    if (s == null) {
+      return null;
+    }
+    for (DateFormat format: formats) {
       try {
         return format.parse(s);
-      } catch(Exception e) {
-        lastException = e;
-      }
+      } catch(ParseException e) {}
     }
-    throw lastException;
+    return null;
+  }
+
+  private Date calcYearEnd(Date start) {
+    Calendar endCalendar = Calendar.getInstance();
+    endCalendar.setTime(start);
+    setStartOfYear(endCalendar);
+    endCalendar.add(Calendar.YEAR, 1);
+    endCalendar.add(Calendar.DAY_OF_MONTH, -1);
+    return endCalendar.getTime();
   }
 
   private Date calcMonthEnd(Date start) {
@@ -307,6 +382,26 @@ public class ABController {
       c.add(Calendar.MONTH, 1);
     }
     return months;
+  }
+
+  private List<String> getShowYears() {
+    Date oldestDate = getOldestDate();
+    Date newestDate = getNewestDate();
+
+    Calendar newest = Calendar.getInstance();
+    newest.setTime(newestDate);
+
+    Calendar c = Calendar.getInstance();
+    c.setTime(oldestDate);
+    setStartOfYear(c);
+
+    List<String> years = new ArrayList<>();
+    while (c.compareTo(newest) <= 0) {
+      String year = YEAR_FORMAT.format(c.getTime());
+      years.add(year);
+      c.add(Calendar.YEAR, 1);
+    }
+    return years;
   }
 
   private Date getOldestDate() {
@@ -355,9 +450,17 @@ public class ABController {
     return newestDate;
   }
 
+  private void setStartOfYear(Calendar c) {
+    setStartOfMonth(c, 0);
+  }
+
   private void setStartOfMonth(Calendar c) {
-    int year = c.get(Calendar.YEAR);
     int month = c.get(Calendar.MONTH);
+    setStartOfMonth(c, month);
+  }
+
+  private void setStartOfMonth(Calendar c, int month) {
+    int year = c.get(Calendar.YEAR);
     c.clear();
     c.set(
         year,

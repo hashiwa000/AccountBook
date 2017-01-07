@@ -49,13 +49,15 @@
     <input type="hidden" />
   </form>
 
-  <form name="selectmonthform" method="GET" action="/accountbook/stats">
-    <select class="selectpicker" name="month" onChange="this.form.submit()">
-      <option th:each="month: ${months}" th:text="${month}" th:selected="${month.equals(thisMonth)}"></option>
-    </select>
-  </form>
-
   <div class="container">
+    <form name="selectmonthform" method="GET" action="/accountbook/stats">
+      <h2>Statistics of
+        <select class="selectpicker" name="period" onChange="this.form.submit()">
+          <option th:each="period: ${periods}" th:text="${period}" th:selected="${period.equals(thisPeriod)}"></option>
+        </select>
+      </h2>
+    </form>
+
     <h3>分類</h3>
     <div class="col-md-6">
       <table id="stats_table" class="table table-striped">

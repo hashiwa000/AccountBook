@@ -81,14 +81,10 @@ public class ABStatistics {
     Map<String, Long> planned_columns = new LinkedHashMap<>();
     for (ABType type: types) {
       String typeName = type.getName();
-      List<Long> planned_or_none = plans.stream()
+      long planned = plans.stream()
         .filter(plan -> plan.getType().getId() == type.getId())
         .mapToLong(plan -> plan.getAmount())
-        .boxed() // long -> Long
-        .collect(Collectors.toList());
-      long planned = planned_or_none.size() != 0
-        ? planned_or_none.get(0)
-        : 0;
+        .sum();
       planned_columns.put(typeName, planned);
     }
     map.put("Planned", planned_columns);
