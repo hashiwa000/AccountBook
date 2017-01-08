@@ -53,52 +53,57 @@
   <form name="logoutform" method="POST" th:action="@{/logout}">
     <input type="hidden" />
   </form>
-  <form name="selectmonthform" method="GET" action="/accountbook/show">
-    <select class="selectpicker" name="month" onChange="this.form.submit()">
-      <option th:each="month: ${months}" th:text="${month}" th:selected="${month.equals(thisMonth)}"></option>
-    </select>
-  </form>
 
-  <div class="col-md-6">
-    <table class="table table-striped" id="abitem-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Amount</th>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Remarks</th>
-          <th><!-- update button --></th>
-          <th><!-- delete button --></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr th:each="item: ${items}">
-          <td th:text="${#dates.format(item.date, 'dd(E)')}"></td>
-          <td th:text="${#numbers.formatInteger(item.amount, 1, 'COMMA')}" align="right"></td>
-          <td th:text="${item.payer}"></td>
-          <td th:text="${item.type}"></td>
-          <td th:text="${item.description}"></td>
-          <td th:text="${item.remarks}"></td>
-          <td>
-            <form action="/accountbook/show" method="post">
-              <input type="hidden" name="idToUpdate" th:value="${item.id}" />
-              <button type="submit" class="btn btn-primary btn-sm">Update</button>
-            </form>
-          </td>
-          <td>
-            <form action="/accountbook/show" method="post">
-              <input type="hidden" name="idToDelete" th:value="${item.id}" />
-              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirmDeleteItem();">Delete</button>
-            </form>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="container">
+    <form name="selectmonthform" method="GET" action="/accountbook/show">
+      <h2>Accout Book items in 
+        <select class="selectpicker" name="month" onChange="this.form.submit()">
+          <option th:each="month: ${months}" th:text="${month}" th:selected="${month.equals(thisMonth)}"></option>
+        </select>
+      </h2>
+    </form>
+  
+    <div class="col-md-6">
+      <table class="table table-striped" id="abitem-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Remarks</th>
+            <th><!-- update button --></th>
+            <th><!-- delete button --></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="item: ${items}">
+            <td th:text="${#dates.format(item.date, 'dd(E)')}"></td>
+            <td th:text="${#numbers.formatInteger(item.amount, 1, 'COMMA')}" align="right"></td>
+            <td th:text="${item.payer}"></td>
+            <td th:text="${item.type}"></td>
+            <td th:text="${item.description}"></td>
+            <td th:text="${item.remarks}"></td>
+            <td>
+              <form action="/accountbook/show" method="post">
+                <input type="hidden" name="idToUpdate" th:value="${item.id}" />
+                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+              </form>
+            </td>
+            <td>
+              <form action="/accountbook/show" method="post">
+                <input type="hidden" name="idToDelete" th:value="${item.id}" />
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirmDeleteItem();">Delete</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-
-  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <script src="../bootstrap/js/bootstrap.min.js"></script>

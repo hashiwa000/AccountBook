@@ -51,7 +51,7 @@
 
   <div class="container">
     <form name="selectmonthform" method="GET" action="/accountbook/stats">
-      <h2>Statistics of
+      <h2>Statistics of items in 
         <select class="selectpicker" name="period" onChange="this.form.submit()">
           <option th:each="period: ${periods}" th:text="${period}" th:selected="${period.equals(thisPeriod)}"></option>
         </select>
@@ -98,10 +98,29 @@
     </div>
   </div>
 
-
-  <div class="container">
-    <div id="stats_graph">グラフ描画エリア</div>
+  <div class="page-content-toggle" id="page-content-wrapper">
+    <div class="container-fluid">
+      <hr />
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-block">
+            <h4 class="card-title">Pie Chart</h4>
+            <div class="inview" id="stats_graph"></div>
+          </div>
+        </div>
+      </div>
+      <hr />
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card card-block">
+            <h4 class="card-title">Column Chart</h4>
+            <div class="inview" id="stats_graph2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
 
   <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
