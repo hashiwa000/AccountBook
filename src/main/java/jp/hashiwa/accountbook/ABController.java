@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -115,28 +116,53 @@ public class ABController {
 
   @RequestMapping(value="/plan/create", method=RequestMethod.POST)
   public String createPlan(
+      @RequestParam String month,
+      @RequestParam(defaultValue="false") boolean all_months,
       HttpServletRequest request,
       Model model) throws Exception
   {
     Map map = request.getParameterMap();
-    String month = ((String[])map.get("month"))[0]; //XXX:
     Date monthDate = parseMonthStr(month);
     if (monthDate == null) {
       throw new Exception("Illegal month: " + monthDate); // exception
     }
+
+    // list one or all months
+    List<Date> months;
+    if (all_months) {
+      Calendar c = Calendar.getInstance();
+      c.setTime(monthDate);
+      setStartOfYear(c);
+      final Date baseMonth = c.getTime();
+      months = IntStream
+        .range(0, 12)
+        .mapToObj(i -> {
+          Calendar tmpc = Calendar.getInstance();
+          tmpc.setTime(baseMonth);
+          tmpc.add(Calendar.MONTH, i);
+          return tmpc.getTime();
+        })
+        .collect(Collectors.toList());
+    } else {
+      months = Arrays.<Date>asList(monthDate);
+    }
+
+    // update plans
     List<ABType> types = service.selectAllTypes();
-    for (ABType type: types) {
-      long id = type.getId();
-      String key = "type_" + id;
-      String value = ((String[])map.get(key))[0]; //XXX:
-      long amount = Long.parseLong(value);
-      ABPlan plan = service.selectOnePlan(monthDate, type);
-      if (plan == null) {
-        plan = new ABPlan(monthDate, type, amount);
-        service.saveAndFlush(plan);
-      } else if (plan.getAmount() != amount) {
-        plan.setAmount(amount);
-        service.saveAndFlush(plan);
+    for (Date targetMonth: months) {
+      for (ABType type: types) {
+        long id = type.getId();
+        String key = "type_" + id;
+        String value = ((String[])map.get(key))[0]; //XXX:
+        long amount = Long.parseLong(value);
+        ABPlan plan = service.selectOnePlan(targetMonth, type);
+        if (plan == null) {
+          plan = new ABPlan(targetMonth, type, amount);
+          service.saveAndFlush(plan);
+        } else if (plan.getAmount() != amount) {
+          plan.setAmount(amount);
+          service.saveAndFlush(plan);
+        }
       }
     }
     return showPlan(month, model);
