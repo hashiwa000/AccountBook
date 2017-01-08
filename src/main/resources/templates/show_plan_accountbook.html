@@ -55,7 +55,10 @@
   </form>
 
   <div class="col-md-6">
-    <table class="table table-striped">
+    <div th:if="${plans.size() == 0}" class="alert alert-warning" role="alert">
+      No plan is found. Create <a th:href="${'/plan/create?month=' + thisMonth}">here</a>.
+    </div>
+    <table th:unless="${plans.size() == 0}" class="table table-striped">
       <thead>
         <tr>
           <th>Type</th>

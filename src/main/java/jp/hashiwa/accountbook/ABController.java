@@ -69,6 +69,9 @@ public class ABController {
     }
     Date end = calcMonthEnd(start);
     List<ABPlan> plans = service.selectAllPlans(start, end);
+    if (plans == null) {
+      plans = Arrays.<ABPlan>asList();
+    }
     model.addAttribute("plans", plans);
 
     List<String> months = getShowMonths();
