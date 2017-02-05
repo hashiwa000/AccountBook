@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @RequestMapping("/rest")
 public class ABRestController {
 
-  private static final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+  private final SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 
   @Autowired
   ABService service;
