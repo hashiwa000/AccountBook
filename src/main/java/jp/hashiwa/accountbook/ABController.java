@@ -266,7 +266,7 @@ public class ABController {
 
     List<ABItem> items = Arrays.<ABItem>asList(item);
     model.addAttribute("created", items);
-    return "created_accountbook";
+    return createAccountBook(-1, model);
   }
 
   @RequestMapping(value="/accountbook/stats", method=RequestMethod.GET)
